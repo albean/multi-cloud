@@ -1,5 +1,12 @@
-from nginx
+FROM python:3.8
 
-RUN rm /usr/share/nginx/html/index.html
+COPY requirements.txt /var/app/requirements.txt
 
-COPY ./index.html /usr/share/nginx/html/index.html
+WORKDIR /var/app
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . /var/app
+
+CMD ["flask", "--app", "server", "run", "--port=80", "--host=0.0.0.0"]
+

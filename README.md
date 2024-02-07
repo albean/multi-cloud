@@ -1,5 +1,7 @@
 # Hello world
 
+🔗 go `http://front.localhost.tv/`
+
 http://front.localhost.tv:5000/
 
 ## Potential resources
