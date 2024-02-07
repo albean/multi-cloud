@@ -1,1 +1,16 @@
 # Hello world
+
+http://front.localhost.tv:5000/
+
+## Potential resources
+
+- EMAIL client - catch email
+- QUEUE - queue
+- CRON - enqueue a messege to a queue
+- CONSUMER - consumer of a queue
+
+# Why is it important
+
+- Frontend development - frontend does not have to relay on remote testing instance
+- Teting product on specefic branch - running local version is way easier
+- Multi-cloud - clouds are pretty new invetion - they still compete
