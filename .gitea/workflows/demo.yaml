@@ -21,6 +21,11 @@ jobs:
   Backend:
     needs: Infrastracture
     runs-on: ubuntu-latest
+    container:
+      image: docker:latest
+      volumes:
+        - /Users/billy/p/multi-cloud:/app
     steps:
       - run: echo "Backend build..."
       - run: docker ps
+      - run: ls -la /app
