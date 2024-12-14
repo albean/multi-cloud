@@ -30,7 +30,7 @@ jobs:
       - run: docker ps
       - run: curl -i http://172.30.0.3:3000
       - run: curl -i http://gitea.fbi.com:3000
-      - run: docker login 172.30.0.3:3000 --username developer --password ${{ secrets.GITTEA_SECRET }}
+      - run: docker login gitea.fbi.com:3000 --username developer --password ${{ secrets.GITTEA_SECRET }}
       # - run: ls -la /app
       # - run: >
       #     echo '{ "insecure-registries" : [ "172.30.0.3:3000" ] }' > /etc/docker/daemon.json
