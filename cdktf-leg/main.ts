@@ -1,5 +1,5 @@
-import { Construct } from "constructs";
-import { App, TerraformStack } from "cdktf";
+import { Construct } from "constructs/lib";
+import { App, TerraformStack } from "cdktf/cdktf-leg/main";
 import { GoogleProvider } from "@cdktf/provider-google/lib/provider";
 import { CloudRunV2Service } from "@cdktf/provider-google/lib/cloud-run-v2-service";
 import { CloudRunServiceIamBinding } from "@cdktf/provider-google/lib/cloud-run-service-iam-binding";

@@ -1,11 +1,11 @@
 {
   "language": "typescript",
-  "app": "ts-node cdktf/main.ts",
+  "app": "ts-node infrastracture/clouds/local/index.ts",
   "projectId": "4f979db8-4347-4867-8e82-bcdaac35e3e7",
   "sendCrashReports": "false",
-  "terraformProviders": [],
+  "terraformProviders": [
+    "Ninlives/shell@~> 1.7"
+  ],
   "terraformModules": [],
-  "context": {
-
-  }
+  "context": {}
 }
