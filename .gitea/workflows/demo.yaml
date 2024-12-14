@@ -19,7 +19,7 @@ jobs:
       - run: echo "🍏 This job's status is ${{ job.status }}."
       # - run: npm ci
   Backend:
-    needs: Infrastracture
+    # needs: Infrastracture
     runs-on: ubuntu-latest
     container:
       image: docker:latest
@@ -28,4 +28,5 @@ jobs:
     steps:
       - run: echo "Backend build..."
       - run: docker ps
+      - run: docker login 172.30.0.3:3000 --user developer --password ${{ secrets.GITTEA_SECRET }}
       - run: ls -la /app
