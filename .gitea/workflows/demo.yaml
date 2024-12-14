@@ -20,7 +20,7 @@ jobs:
       # - run: npm ci
   Backend:
     needs: Infrastracture
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     steps:
       - run: echo "Backend build..."
       - run: docker ps
