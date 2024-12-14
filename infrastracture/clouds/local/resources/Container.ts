@@ -1,13 +1,13 @@
 import { implement } from "infrastracture/common/Resource";
-import { Container } from "../../app/Constructs";
-import { $ } from "../Development";
+import { Container } from "infrastracture/resources";
+import { $ } from "infrastracture/clouds/local";
 import { run } from "common/utils";
 
 export const ContainerImpl = implement(
   Container,
   async (p): Promise<{}>  => {
-    const build = await $(p.build);
     const name = "backend";
+    const build = await $(p.build);
 
     await run(["docker", "rm", "-f", name])
 

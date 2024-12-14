@@ -1,5 +1,7 @@
 # Hello world
 
+- Terraform `https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli`
+
 🔗 go `http://front.localhost.tv/`
 
 http://front.localhost.tv:5000/

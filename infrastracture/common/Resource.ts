@@ -14,9 +14,14 @@ export const Resource = <P>() =>
   <T extends symbol, E extends Record<string, (itself: Resource<T, P> & E, ...args: any) => any>>(symbol: T, extension: E) => {
     const res = (props: P): Resource<T, P> & Extension<E> => {
       const resource = {};
+
       const fn = impl[symbol];
 
       Values.set(resource, fn(props));
+
+      Object.entries(extension).map(([k, v]) => {
+        resource[k] = (...args: any) => extension[k](resource as any, ...args) as any
+      })
 
 
       return resource as any;
@@ -48,6 +53,9 @@ export const digest = <V extends Record<K, any>, K extends symbol & keyof V>(spe
   <S extends K>(of: Resource<S, any>) => {
     const val = Values.get(of)
 
-
     return val as ReturnType<V[S]>
   }
+
+
+
+
