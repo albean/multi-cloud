@@ -29,7 +29,7 @@ jobs:
       - run: echo "Backend build..."
       - run: docker ps
       - run: curl -i http://172.30.0.3:3000
-      - run: curl -i http://gitea.fbi.com:3000
+      - run: curl -i http://gitea.fbi.com:3015
       - run: docker login gitea.fbi.com:3000 --username developer --password ${{ secrets.GITTEA_SECRET }}
       # - run: ls -la /app
       # - run: >
