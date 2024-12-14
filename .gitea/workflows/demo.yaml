@@ -25,8 +25,11 @@ jobs:
       image: docker:latest
       volumes:
         - /Users/billy/p/multi-cloud:/app
+        - /var/run/docker.sock:/var/run/docker.sock
     steps:
       - run: echo "Backend build..."
       - run: docker ps
-      - run: docker login http://172.30.0.3:3000 --username developer --password ${{ secrets.GITTEA_SECRET }}
       - run: ls -la /app
+      - run: >
+          echo '{ "insecure-registries" : [ "172.30.0.3:3000" ] }' > /etc/docker/daemon.json
+      - run: docker login 172.30.0.3:3000 --username developer --password ${{ secrets.GITTEA_SECRET }}
