@@ -3,7 +3,7 @@ run-name: ${{ gitea.actor }} is testing out Gitea Actions 🚀
 on: [push]
 
 jobs:
-  Explore-Gitea-Actions:
+  Infrastracture:
     runs-on: node
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ gitea.event_name }} event."
@@ -18,3 +18,8 @@ jobs:
           ls ${{ gitea.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
       - run: npm ci
+  Backend:
+    needs: Infrastracture
+    runs-on: node
+    steps:
+      - run: echo "Backend build..."
