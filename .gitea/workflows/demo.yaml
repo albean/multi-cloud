@@ -21,16 +21,12 @@ jobs:
   Backend:
     # needs: Infrastracture
     runs-on: ubuntu-latest
-    # container:
-    #   image: docker:latest
-    #   volumes:
-    #     - /Users/billy/p/multi-cloud:/app
+    container:
+      image: docker:latest
+      volumes:
+        - /Users/billy/p/multi-cloud:/app
     steps:
       - run: echo "Backend build..."
       - run: docker ps
-      - run: curl -i http://172.30.0.3:3000
-      - run: curl -i http://gitea.fbi.com:3015
-      - run: docker login gitea.fbi.com:3000 --username developer --password ${{ secrets.GITTEA_SECRET }}
-      # - run: ls -la /app
-      # - run: >
-      #     echo '{ "insecure-registries" : [ "172.30.0.3:3000" ] }' > /etc/docker/daemon.json
+      - run: docker login gitea.fbi.com:3015 --username developer --password ${{ secrets.GITTEA_SECRET }}
+      - run: ls -la /app
