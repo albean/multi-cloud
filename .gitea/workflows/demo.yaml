@@ -24,7 +24,7 @@ jobs:
       - run: npm ci
 
   Backend:
-    needs: Infrastracture
+    # needs: Infrastracture
     runs-on: ubuntu-latest
     container:
       image: docker:latest
@@ -33,5 +33,7 @@ jobs:
     steps:
       - run: echo "Backend build..."
       - run: docker ps
-      - run: docker login gitea.fbi.com:3015 --username developer --password ${{ secrets.GITTEA_SECRET }}
       - run: ls -la /app
+      - run: export TAG=$(date +"%Y-%d-%m-%H-%M")
+      - run: docker build -t $TAG backend
+
