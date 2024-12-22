@@ -1,7 +1,6 @@
 #!/usr/bin/env ts-node
 
 import { Application } from "infrastracture/application";
-import "infrastracture/clouds/local"
+import "infrastracture/clouds/gcloud"
 
-Application({ domain: `localhost.tv` })
-
+// Application({ domain: `lasek.io` })
