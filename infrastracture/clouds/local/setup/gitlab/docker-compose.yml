@@ -8,8 +8,8 @@ services:
     privileged: true
     environment:
       GITLAB_OMNIBUS_CONFIG: |
-        # Add any other gitlab.rb configuration here, each on its own line
         external_url 'https://gitlab.fbi.com'
+        # Add any other gitlab.rb configuration here, each on its own line
 
     ports:
       - '3012:80'

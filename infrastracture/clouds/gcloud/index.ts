@@ -17,7 +17,6 @@ type Constructor<T, Args extends any[]> = new (scope: any, ...args: Args) => T;
 const tfResourceToFunc = <T, Args extends any[]>(Klass: Constructor<T, Args>): ((...args: Args) => T) =>
   (...args: Args) => new Klass(scope, ...args);
 
-
 const location = "europe-west1";
 const project = "ultimate-life-396919";
 const projectNumber = "1087863064045";
@@ -29,6 +28,33 @@ const repo = gcloud.CloudBuildRepository("repo", {
   remoteUri: `https://github.com/albean/multi-cloud.git`
 })
 
+const instance = gcloud.SqlDatabaseInstance("db-instance", {
+  name: "main",
+  region: location,
+  databaseVersion: "POSTGRES_15",
+  settings: {
+    tier: "db-f1-micro",
+  }
+})
+
+const user = gcloud.SqlUser("db-user", {
+  instance: instance.id,
+  name: "app",
+  password: "Tzh-RTPe-C9fkLmAHwxhb3hyU!e@u4"
+})
+user.password
+
+// const secret = gcloud.SecretManagerSecret("password", {
+//   secretId: "app",
+//   replication: {}
+// });
+
+const database = gcloud.SqlDatabase("db", {
+  name: "prod",
+  instance: instance.id,
+})
+
+instance.dnsName
 
 const email = `${projectNumber}-compute@developer.gserviceaccount.com`;
 const member = `serviceAccount:${email}`;

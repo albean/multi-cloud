@@ -23,6 +23,10 @@ export const ServiceAccountIamBinding = tfResourceToFunc(gcloud.serviceAccountIa
 export const ProjectIamMember = tfResourceToFunc(gcloud.projectIamMember.ProjectIamMember);
 export const ArtifactRegistryRepository = tfResourceToFunc(gcloud.artifactRegistryRepository.ArtifactRegistryRepository);
 export const CloudRunServiceIamBinding = tfResourceToFunc(gcloud.cloudRunServiceIamBinding.CloudRunServiceIamBinding);
+export const SqlDatabase = tfResourceToFunc(gcloud.sqlDatabase.SqlDatabase);
+export const SqlDatabaseInstance = tfResourceToFunc(gcloud.sqlDatabaseInstance.SqlDatabaseInstance);
+export const SqlUser = tfResourceToFunc(gcloud.sqlUser.SqlUser);
+export const SecretManagerSecret = tfResourceToFunc(gcloud.secretManagerSecret.SecretManagerSecret);
 
 export const location = "europe-west1";
 export const project = "ultimate-life-396919";
