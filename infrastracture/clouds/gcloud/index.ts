@@ -90,7 +90,16 @@ const service = gcloud.CloudRun('backend-svc', {
   deletionProtection: false,
   template: {
     scaling: { maxInstanceCount: 1, minInstanceCount: 0 },
-    containers: [{ image: "us-docker.pkg.dev/cloudrun/container/hello" }],
+    containers: [{
+      image: "us-docker.pkg.dev/cloudrun/container/hello",
+      volumeMounts: [{ name: "cloudsql", mountPath: '/cloudsql' }],
+    }],
+    volumes: [{
+      name: "cloudsql",
+      cloudSqlInstance: {
+        instances: [instance.connectionName],
+      }
+    }]
   }
 });
 

@@ -1,8 +1,5 @@
 FROM node:23.5.0-bookworm
 
-COPY requirements.txt /var/app/requirements.txt
-
-
 RUN mkdir /app
 WORKDIR /app
 
@@ -11,8 +8,14 @@ COPY package-lock.json .
 
 RUN npm ci;
 
-COPY . /var/app
+COPY . /app
 
-CMD ["flask", "--app", "server", "run", "--port=8079", "--host=0.0.0.0"]
+RUN ls -la
+
+COPY ./backend/entrypoint.sh /var/app/entry
+
+RUN chmod +x /var/app/entry
+
+ENTRYPOINT /var/app/entry
 
 
