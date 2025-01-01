@@ -1,12 +1,18 @@
-FROM python:3.8
+FROM node:23.5.0-bookworm
 
 COPY requirements.txt /var/app/requirements.txt
 
-WORKDIR /var/app
 
-RUN pip install --no-cache-dir -r requirements.txt;
+RUN mkdir /app
+WORKDIR /app
+
+COPY ./package.json .
+COPY package-lock.json .
+
+RUN npm ci;
 
 COPY . /var/app
 
-CMD ["flask", "--app", "server", "run", "--port=8080", "--host=0.0.0.0"]
+CMD ["flask", "--app", "server", "run", "--port=8079", "--host=0.0.0.0"]
+
 
