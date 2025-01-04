@@ -8,6 +8,7 @@ import { CloudRunV2Service } from "@cdktf/provider-google/lib/cloud-run-v2-servi
 import { CloudbuildTrigger } from "@cdktf/provider-google/lib/cloudbuild-trigger";
 import { Cloudbuildv2Repository } from "@cdktf/provider-google/lib/cloudbuildv2-repository";
 import * as gcloud from "./resources"
+import * as tf from "cdktf"
 import { CloudRunServiceIamBinding } from "@cdktf/provider-google/lib/cloud-run-service-iam-binding";
 import { LocalBackend } from 'cdktf';
 import { scope, app } from "infrastracture/clouds/gcloud/scope";
@@ -81,7 +82,9 @@ const dockerRepo = gcloud.ArtifactRegistryRepository("repository", {
   format: "docker",
   repositoryId: "backend",
 })
-const image = `${dockerRepo.location}-docker.pkg.dev/${project}/${dockerRepo.name}/main`;
+const image = `${dockerRepo.location}-docker.pkg.dev/${project}/${dockerRepo.name}/main:ts-0104`;
+
+gcloud.Out("image", { value: image })
 
 const service = gcloud.CloudRun('backend-svc', {
   name: "todo-all",
@@ -91,7 +94,7 @@ const service = gcloud.CloudRun('backend-svc', {
   template: {
     scaling: { maxInstanceCount: 1, minInstanceCount: 0 },
     containers: [{
-      image: "us-docker.pkg.dev/cloudrun/container/hello",
+      image: image,
       volumeMounts: [{ name: "cloudsql", mountPath: '/cloudsql' }],
     }],
     volumes: [{

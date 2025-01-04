@@ -13,6 +13,7 @@
     "constructs": "^10.3.0",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.38.3",
+    "esbuild": "^0.24.2",
     "eslint": "^9.17.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",

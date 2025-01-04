@@ -8,7 +8,7 @@ import { CloudRunV2Service } from "@cdktf/provider-google/lib/cloud-run-v2-servi
 import { CloudbuildTrigger } from "@cdktf/provider-google/lib/cloudbuild-trigger";
 import { Cloudbuildv2Repository } from "@cdktf/provider-google/lib/cloudbuildv2-repository";
 import * as gcloud from "@cdktf/provider-google/lib"
-import { LocalBackend } from 'cdktf';
+import { TerraformOutput, LocalBackend } from 'cdktf';
 import { scope, app } from "infrastracture/clouds/gcloud/scope";
 
 type Constructor<T, Args extends any[]> = new (scope: any, ...args: Args) => T;
@@ -27,6 +27,7 @@ export const SqlDatabase = tfResourceToFunc(gcloud.sqlDatabase.SqlDatabase);
 export const SqlDatabaseInstance = tfResourceToFunc(gcloud.sqlDatabaseInstance.SqlDatabaseInstance);
 export const SqlUser = tfResourceToFunc(gcloud.sqlUser.SqlUser);
 export const SecretManagerSecret = tfResourceToFunc(gcloud.secretManagerSecret.SecretManagerSecret);
+export const Out = tfResourceToFunc(TerraformOutput);
 
 export const location = "europe-west1";
 export const project = "ultimate-life-396919";

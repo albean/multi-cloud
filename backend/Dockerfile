@@ -10,6 +10,8 @@ RUN npm ci;
 
 COPY . /app
 
+RUN npx esbuild backend/entry.ts
+
 RUN ls -la
 
 COPY ./backend/entrypoint.sh /var/app/entry
