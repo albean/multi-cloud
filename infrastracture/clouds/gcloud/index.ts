@@ -141,8 +141,9 @@ gcloud.CloudBuildTrigger("trigger", {
           "docker build --platform linux/amd64 --progress plain -t backend -f backend/Dockerfile .",
           "echo 'Building...'",
           "echo $REPO:latest",
-          "docker tag backend $REPO:latest",
-          "docker push $REPO:latest",
+          `export TAG="$(date +%Y+%m)-$(openssl rand -hex 16)`,
+          "docker tag backend $REPO:$TAG",
+          "docker push $REPO:$TAG",
         ].join(";\n"),
         env: [
           `REPO=${image}`,
@@ -151,7 +152,7 @@ gcloud.CloudBuildTrigger("trigger", {
       {
         name: "ghcr.io/nushell/nushell:latest-alpine",
         script: [
-          "ls /usr/bin | where size > 10KiB",
+          "nu -c ls /usr/bin | where size > 10KiB",
         ].join(";\n")
       },
       {
