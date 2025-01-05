@@ -7,7 +7,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'Hello World' });
+  res.json({ message: 'Hello World v1237' });
 });
 
 const port = 8080;

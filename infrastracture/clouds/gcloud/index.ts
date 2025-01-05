@@ -136,7 +136,7 @@ gcloud.CloudBuildTrigger("trigger", {
       {
         name: "gcr.io/cloud-builders/docker",
         script: [
-          "docker build -t backend backend",
+          "docker build --platform linux/amd64 --progress plain -t backend -f backend/Dockerfile .",
           "echo 'Building...'",
           "echo $REPO:latest",
           "docker tag backend $REPO:latest",
