@@ -151,20 +151,18 @@ gcloud.CloudBuildTrigger("trigger", {
         ]
       },
       {
-        name: "ghcr.io/nushell/nushell:latest-alpine",
-        script: [
-          "nu -c ls /usr/bin | where size > 10KiB",
-        ].join(";\n")
-      },
-      {
         name: "gcr.io/google.com/cloudsdktool/cloud-sdk",
-        entrypoint: "gcloud",
-
         script: [
           `ls -la`,
           `export IMAGE=$(cat image.txt)`,
           `gcloud run deploy ${service.name} --image ${image}:TAG`,
         ].join(";\n"),
+      },
+      {
+        name: "ghcr.io/nushell/nushell:latest-alpine",
+        script: [
+          "nu -c 'ls /usr/bin | where size > 10KiB",
+        ].join(";\n")
       },
     ],
   },
