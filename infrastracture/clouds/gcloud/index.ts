@@ -155,7 +155,7 @@ gcloud.CloudBuildTrigger("trigger", {
         script: [
           `ls -la`,
           `export IMAGE=$(cat image.txt)`,
-          `gcloud run deploy ${service.name} --image ${image}:TAG`,
+          `gcloud run deploy ${service.name} --image $IMAGE`,
         ].join(";\n"),
       },
       {
