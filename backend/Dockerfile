@@ -10,9 +10,9 @@ RUN npm ci;
 
 COPY . /app
 
-RUN npx esbuild backend/entry.ts
+RUN npx esbuild --bundle --platform=node --outfile=dist/entry.js --packages=external backend/entry.ts
 
-RUN ls -la
+RUN ls -la dist .
 
 COPY ./backend/entrypoint.sh /var/app/entry
 

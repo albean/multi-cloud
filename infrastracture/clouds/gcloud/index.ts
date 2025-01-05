@@ -99,7 +99,7 @@ const service = gcloud.CloudRun('backend-svc', {
       image: image,
       volumeMounts: [{ name: "cloudsql", mountPath: '/cloudsql' }],
       env: [
-        { name: "VER", value: "v4" },
+        { name: "VER", value: "v7" },
 
         { name: "DB_HOST", value: instance.ipAddress.get(0).getStringAttribute("ip_address") },
         { name: "DB_NAME", value: "prod" },
@@ -115,10 +115,6 @@ const service = gcloud.CloudRun('backend-svc', {
     }]
   }
 });
-
-// const service = gcloud.CloudRun('backend-svc', {
-//
-// });
 
 gcloud.CloudRunServiceIamBinding("all-members", {
   location: service.location,
@@ -169,5 +165,8 @@ gcloud.CloudBuildTrigger("trigger", {
 });
 
 
+gcloud.Out("service-url", {
+  value: service.uri,
+})
 
 app.synth();

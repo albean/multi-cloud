@@ -16,7 +16,7 @@ migrate() {
 }
 
 serve() {
-  node dist/entry.js serve
+  node dist/entry.js server
 }
 
 migrate

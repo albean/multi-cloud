@@ -4,7 +4,10 @@ export const fixtures = async () => {
   console.log("Loading fixtures....")
 
   await Promise.all(eventsFixtures.map(async _ => {
-    events.getSQL
+    await db.insert(events).values({
+      name: _.name,
+      slug: _.slug,
+    });
   }))
 }
 
