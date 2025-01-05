@@ -9,10 +9,10 @@ export const orders = p.pgTable("orders", {
   firstName: p.text(),
 });
 
-export const events = p.pgTable("orders", {
+export const events = p.pgTable("events", {
   id: p.serial().primaryKey(),
-  email: p.text(),
-  firstName: p.text(),
+  slug: p.text(),
+  name: p.text(),
 });
 
 

@@ -16,7 +16,9 @@ type Constructor<T, Args extends any[]> = new (scope: any, ...args: Args) => T;
 const tfResourceToFunc = <T, Args extends any[]>(Klass: Constructor<T, Args>): ((...args: Args) => T) =>
   (...args: Args) => new Klass(scope, ...args);
 
+// @see https://registry.terraform.io/providers/hashicorp/google/6.14.1/docs/resources/cloud_run_v2_service google_cloud_run_v2_service
 export const CloudRun = tfResourceToFunc(CloudRunV2Service);
+
 export const CloudBuildTrigger = tfResourceToFunc(CloudbuildTrigger);
 export const CloudBuildRepository = tfResourceToFunc(Cloudbuildv2Repository);
 export const ServiceAccountIamBinding = tfResourceToFunc(gcloud.serviceAccountIamBinding.ServiceAccountIamBinding);

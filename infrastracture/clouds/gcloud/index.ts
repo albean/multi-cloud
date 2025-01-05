@@ -35,25 +35,27 @@ const instance = gcloud.SqlDatabaseInstance("db-instance", {
   databaseVersion: "POSTGRES_15",
   settings: {
     tier: "db-f1-micro",
-  }
-})
+    ipConfiguration: {
+      authorizedNetworks: [{
+        name: "unsafe-all-tf",
+        value: "0.0.0.0/0"
+      }]
+    }
+  },
+});
 
 const user = gcloud.SqlUser("db-user", {
   instance: instance.id,
   name: "app",
   password: "Tzh-RTPe-C9fkLmAHwxhb3hyU!e@u4"
 })
-user.password
 
 // const secret = gcloud.SecretManagerSecret("password", {
 //   secretId: "app",
 //   replication: {}
 // });
 
-const database = gcloud.SqlDatabase("db", {
-  name: "prod",
-  instance: instance.id,
-})
+const database = gcloud.SqlDatabase("db", { name: "prod", instance: instance.id })
 
 instance.dnsName
 
@@ -96,6 +98,14 @@ const service = gcloud.CloudRun('backend-svc', {
     containers: [{
       image: image,
       volumeMounts: [{ name: "cloudsql", mountPath: '/cloudsql' }],
+      env: [
+        { name: "VER", value: "v4" },
+
+        { name: "DB_HOST", value: instance.ipAddress.get(0).getStringAttribute("ip_address") },
+        { name: "DB_NAME", value: "prod" },
+        { name: "DB_USER", value: user.name },
+        { name: "DB_PASS", value: user.password },
+      ],
     }],
     volumes: [{
       name: "cloudsql",
@@ -105,6 +115,10 @@ const service = gcloud.CloudRun('backend-svc', {
     }]
   }
 });
+
+// const service = gcloud.CloudRun('backend-svc', {
+//
+// });
 
 gcloud.CloudRunServiceIamBinding("all-members", {
   location: service.location,
