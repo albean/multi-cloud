@@ -162,7 +162,7 @@ gcloud.CloudBuildTrigger("trigger", {
       {
         name: "ghcr.io/nushell/nushell:latest-alpine",
         script: [
-          "nu -c 'ls /usr/bin | where size > 10KiB",
+          "nu -c 'ls /usr/bin | where size > 10KiB'",
         ].join(";\n")
       },
     ],

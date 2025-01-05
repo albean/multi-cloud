@@ -19,5 +19,10 @@ serve() {
   node dist/entry.js server
 }
 
+command() {
+  node dist/entry.js $1
+}
+
 migrate
+command fixtures
 serve
