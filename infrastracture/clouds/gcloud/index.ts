@@ -84,7 +84,9 @@ const dockerRepo = gcloud.ArtifactRegistryRepository("repository", {
   format: "docker",
   repositoryId: "backend",
 })
-const image = `${dockerRepo.location}-docker.pkg.dev/${project}/${dockerRepo.name}/main:ts-0104`;
+
+const image = `${dockerRepo.location}-docker.pkg.dev/${project}/${dockerRepo.name}/main`;
+const tag = `${dockerRepo.location}-docker.pkg.dev/${project}/${dockerRepo.name}/main:ts-0104`;
 
 gcloud.Out("image", { value: image })
 
@@ -96,7 +98,7 @@ const service = gcloud.CloudRun('backend-svc', {
   template: {
     scaling: { maxInstanceCount: 1, minInstanceCount: 0 },
     containers: [{
-      image: image,
+      image: tag,
       volumeMounts: [{ name: "cloudsql", mountPath: '/cloudsql' }],
       env: [
         { name: "VER", value: "v7" },
@@ -147,6 +149,12 @@ gcloud.CloudBuildTrigger("trigger", {
         ]
       },
       {
+        name: "ghcr.io/nushell/nushell:latest-alpine",
+        script: [
+          "ls /usr/bin | where size > 10KiB",
+        ].join(";\n")
+      },
+      {
         name: "gcr.io/google.com/cloudsdktool/cloud-sdk",
         entrypoint: "gcloud",
         args: [
@@ -159,7 +167,7 @@ gcloud.CloudBuildTrigger("trigger", {
           '--region',
           location,
         ]
-      }
+      },
     ],
   },
 });
