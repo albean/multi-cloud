@@ -144,6 +144,7 @@ gcloud.CloudBuildTrigger("trigger", {
           "echo $REPO:$TAG",
           "docker tag backend $REPO:$TAG",
           "docker push $REPO:$TAG",
+          "echo $REPO:$TAG > image.txt",
         ].join(";\n"),
         env: [
           `REPO=${image}`,
@@ -158,16 +159,12 @@ gcloud.CloudBuildTrigger("trigger", {
       {
         name: "gcr.io/google.com/cloudsdktool/cloud-sdk",
         entrypoint: "gcloud",
-        args: [
-          'run',
-          'deploy',
-          service.name,
-          '--image',
-          // `us-docker.pkg.dev/cloudrun/container/hello`,
-          `${image}:latest`,
-          '--region',
-          location,
-        ]
+
+        script: [
+          `ls -la`,
+          `export IMAGE=$(cat image.txt)`,
+          `gcloud run deploy ${service.name} --image ${image}:TAG`,
+        ].join(";\n"),
       },
     ],
   },
