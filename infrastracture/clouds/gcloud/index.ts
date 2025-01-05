@@ -140,7 +140,7 @@ gcloud.CloudBuildTrigger("trigger", {
         script: [
           "docker build --platform linux/amd64 --progress plain -t backend -f backend/Dockerfile .",
           "echo 'Building...'",
-          `export TAG="$(date +%Y%m)-$(openssl rand -hex 16)"`,
+          `export TAG="$(date +%y%m%d)-$(openssl rand -hex 16 | head -c 10)"`,
           "echo $REPO:$TAG",
           "docker tag backend $REPO:$TAG",
           "docker push $REPO:$TAG",
