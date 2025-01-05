@@ -11,7 +11,7 @@ export const orders = p.pgTable("orders", {
 
 export const events = p.pgTable("events", {
   id: p.serial().primaryKey(),
-  slug: p.text(),
+  slug: p.text().unique(),
   name: p.text(),
 });
 
