@@ -18,9 +18,10 @@ app.get('/events', async (req: Request, res: Response) => {
 });
 
 app.post('/order', async (req: Request, res: Response) => {
-  const eventsRes = await db.select().from(events)
+  const data = req.body;
 
-  res.json(eventsRes);
+
+  res.json({ status: "sucess" });
 });
 
 const port = 8080;

@@ -15,4 +15,8 @@ export const events = p.pgTable("events", {
   name: p.text(),
 });
 
+export const fixtures = p.pgTable("fixtures", {
+  name: p.text().primaryKey(),
+});
+
 
