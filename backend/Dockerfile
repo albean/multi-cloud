@@ -1,11 +1,8 @@
-FROM ghcr.io/puppeteer/puppeteer:23.11.1
-
-
-WORKDIR /app
-
-RUN chown node /app
+FROM node:23.5.0-bookworm
 
 USER node
+
+WORKDIR /app
 
 COPY ./package.json .
 COPY package-lock.json .
@@ -21,6 +18,7 @@ RUN npx esbuild --bundle --platform=node --outfile=dist/entry.js --packages=exte
 RUN ls -la dist .
 
 COPY ./backend/entrypoint.sh /app/entry
+
 
 ENTRYPOINT ["bash", "/app/entry"]
 

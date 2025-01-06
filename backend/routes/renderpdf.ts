@@ -1,13 +1,11 @@
-import puppeteer from 'puppeteer';
+import * as fs from 'fs';
+import * as pdf from 'html-pdf';
 
 export const pdfrender = (async () => {
-  const browser = await puppeteer.launch({
-    args: [ ]
+  const options = { format: 'Letter' };
+
+  pdf.create("<h1>Hallo world v55</h1>", options).toFile('./public/businesscard.pdf', (err, res) => {
+    if (err) return console.log(err);
+    console.log(res);
   });
-  const page = await browser.newPage();
-
-  await page.setContent('<h1>Hello World!</h1>');
-  await page.pdf({ path: 'public/output.pdf', format: 'A4' });
-
-  await browser.close();
 });
