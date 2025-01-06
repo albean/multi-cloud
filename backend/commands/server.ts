@@ -1,7 +1,8 @@
 import express, { Request, Response } from 'express';
-import { events, db } from "backend/schema"
+import { events, db, OrderFields } from "backend/schema"
 import cors from 'cors';
 import { pdfrender } from 'backend/routes/renderpdf';
+import { eq } from 'drizzle-orm';
 
 const app = express();
 
@@ -19,9 +20,21 @@ app.get('/events', async (req: Request, res: Response) => {
   res.json(eventsRes);
 });
 
-app.post('/order', async (req: Request, res: Response) => {
+app.post('/buy', async (req: Request, res: Response) => {
   const data = req.body;
 
+  console.log("BYING", data)
+
+  const event = (await db.select().from(events).where(eq(events.id, data.id)))[0];
+
+  const order: OrderFields = {
+    eventId: event.id,
+    // @FIXME Insert real values
+    firstName: "john",
+    firstName: "johis",
+  }
+
+  console.log(event);
 
   res.json({ status: "sucess" });
 });

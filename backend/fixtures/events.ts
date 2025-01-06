@@ -1,10 +1,14 @@
 import { fixtures as fixturesTable, events, db } from "backend/schema"
 
 export const eventsFixture = async () => {
+  await db.delete(events).returning();
+
   await Promise.all(eventsFixtures.map(async _ => {
     await db.insert(events).values({
       name: _.name,
       slug: _.slug,
+      image: _.image,
+      date: _.data,
     });
   }))
 }

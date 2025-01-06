@@ -18,15 +18,13 @@ export const fixtures = async () => {
 
     console.log("Inserted")
   }
+
+  process.exit();
 }
 
 const declaredFixtures = [
   {
-    name: "clenup-events",
-    fn: async () => db.delete(events).returning(),
-  },
-  {
-    name: "insert-events",
+    name: "insert-events-v1",
     fn: eventsFixture,
   },
 ]

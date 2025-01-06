@@ -23,6 +23,6 @@ command() {
   node dist/entry.js $1
 }
 
-# migrate
-# command fixtures
+migrate
+command fixtures
 serve
