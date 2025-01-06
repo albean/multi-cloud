@@ -1,8 +1,11 @@
 FROM ghcr.io/puppeteer/puppeteer:23.11.1
 
-USER node
 
 WORKDIR /app
+
+RUN chown node /app
+
+USER node
 
 COPY ./package.json .
 COPY package-lock.json .

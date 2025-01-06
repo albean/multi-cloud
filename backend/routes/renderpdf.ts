@@ -2,10 +2,7 @@ import puppeteer from 'puppeteer';
 
 export const pdfrender = (async () => {
   const browser = await puppeteer.launch({
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox'
-    ]
+    args: [ ]
   });
   const page = await browser.newPage();
 
