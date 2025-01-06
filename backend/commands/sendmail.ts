@@ -2,26 +2,32 @@
 import nodemailer from 'nodemailer';
 
 export const sendmail = async () => {
+  console.log(process.env.SMTP_PASS)
   const transporter = nodemailer.createTransport({
-    host: "smtp.fbi.com",
-    port: 1025,
-    tls: {
-      rejectUnauthorized: false,
-    }
+    host: "poczta1.mat.umk.pl",
+    port: 587,
+    auth: {
+      user: "lasek",
+      pass: process.env.SMTP_PASS,
+    },
   });
 
   const mailOptions = {
-    from: 'your-email@gmail.com',
-    to: 'recipient-email@gmail.com',
+    from: 'lasek@mat.umk.pl',
+    to: 'lasek.accounts@icloud.com',
     subject: 'Subject of the email',
     text: 'Body of the email',
     attachments: [
       {
-        filename: 'attachment.txt',
-        path: './path/to/attachment.txt',
+        filename: 'attachment.pdf',
+        path: 'public/businesscard.pdf',
       },
     ],
   };
 
+  console.log("Sending")
+
   await transporter.sendMail(mailOptions);
+
+  console.log("Done")
 }

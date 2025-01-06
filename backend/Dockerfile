@@ -1,6 +1,15 @@
-FROM node:23.5.0-bookworm
+# FROM node:23.5.0-bookworm
+FROM node:slim
 
+# Install latest Chrome dev package and fonts to support major charsets
+RUN apt-get update \
+    && apt-get install -y chromium --no-install-recommends
+
+# Run everything after as non-privileged user.
 USER node
+
+# We don't need the standalone Chromium
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 WORKDIR /app
 
@@ -11,15 +20,21 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 RUN npm ci;
 
-COPY . /app
+# COPY . /app
+#
+# RUN npx esbuild --bundle --platform=node --outfile=dist/entry.js --packages=external backend/entry.ts
+#
+# RUN ls -la dist .
+#
+# COPY ./backend/entrypoint.sh /app/entry
+#
+#
+# ENTRYPOINT ["bash", "/app/entry"]
 
-RUN npx esbuild --bundle --platform=node --outfile=dist/entry.js --packages=external backend/entry.ts
+COPY _billy/puppeteer.js puppeteer.js
 
-RUN ls -la dist .
+COPY backend backend
 
-COPY ./backend/entrypoint.sh /app/entry
+ENV PUPPETEER_BIN=/bin/chromium
 
-
-ENTRYPOINT ["bash", "/app/entry"]
-
-
+CMD ["puppeteer.js"]

@@ -1,0 +1,209 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inverted Border Radius Techniques</title>
+  <style>
+
+    html {
+      -webkit-print-color-adjust: exact;
+
+    }
+
+    html, body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      --corner-size: 14px;
+      --border: 1px solid #ccc;
+      --border-dotted-size: 3px;
+      --bg: #fff;
+      background-color: var(--bg);
+      color: white;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .example {
+      margin: 20px 0;
+    }
+
+    .pseudo-elements {
+      position: relative;
+      height: 200px;
+      background-color: #FDEBDD;
+      border-radius: 5px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+
+    .pseudo-elements:before {
+      content: '';
+      display: block;
+      position: absolute;
+      inset: 0;
+      border: var(--border);
+    }
+
+
+    .pseudo-elements > .main-body {
+      width: 400px;
+      height: 100%;
+      position: relative;
+      border-right: 4px dashed #aaa;
+      flex-grow: 1;
+      display: flex;
+      color: #222;
+    }
+
+    .pseudo-elements > .main-body .content {
+      padding: 16px 14px;
+    }
+
+    .pseudo-elements > .main-body .content .h5 {
+      font-size: 10px;
+      margin-bottom: -5px;
+    }
+
+    .pseudo-elements > .main-body .content .h4 {
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    .pseudo-elements > .main-body .content .block {
+      padding: 5px 0;
+    }
+
+    .pseudo-elements > .img {
+      width: 200px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .pseudo-elements > .img img {
+      width: 80%;
+    }
+
+    .pseudo-elements > .main-body > .image {
+      aspect-ratio: 1;
+      height: 100%;
+      background-image: url(https://images.unsplash.com/photo-1717184359916-c53b012fd983?q=80&w=3648&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D);
+      background-size: cover;
+      background-position: center;
+
+    }
+
+    .pseudo-elements > .main-body > .corner {
+      position: absolute;
+      width: calc(var(--corner-size) * 2);
+      height: calc(var(--corner-size) * 2);
+      background-color: var(--bg);
+      border-radius: 100%;
+      top: calc(var(--corner-size) * -1);
+      left: calc(var(--corner-size) * -1)
+      z-index: 20;
+      border: var(--border);
+    }
+
+    .pseudo-elements > .main-body > .corner.tr {
+      left: auto;
+      right: calc(var(--corner-size) * -1 - var(--border-dotted-size));
+    }
+
+    .pseudo-elements > .main-body > .corner.br {
+      left: auto;
+      right: calc(var(--corner-size) * -1 - var(--border-dotted-size));
+      top: auto;
+      bottom: calc(var(--corner-size) * -1);
+    }
+
+    .pseudo-elements > .main-body > .corner.bl {
+      right: auto;
+      left: calc(var(--corner-size) * -1);
+      top: auto;
+      bottom: calc(var(--corner-size) * -1);
+    }
+
+
+    /* Example 2: Using CSS Masks */
+
+    /* Example 3: Using Additional HTML Elements */
+    .additional-elements {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      background-color: #eee;
+      overflow: hidden;
+    }
+
+    .top-left {
+      top: -12px;
+      left: -12px;
+    }
+
+    .top-right {
+      top: -12px;
+      right: -12px;
+    }
+
+    .bottom-left {
+      bottom: -12px;
+      left: -12px;
+    }
+
+    .bottom-right {
+      bottom: -12px;
+      right: -12px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <section class="example">
+      <div class="pseudo-elements">
+        <div class="main-body">
+          <div class="corner tr"></div>
+          <!-- <div class="corner tl"></div> -->
+          <div class="corner br"></div>
+          <!-- <div class="corner bl"></div> -->
+
+          <div class="image"></div>
+          <div class="content">
+            <div class="block">
+              <div class="h5">BILET NA WYDARZENIE</div>
+              <div class="h4">{EVENT_NAME}</div>
+            </div>
+
+            <div class="block">
+              <div class="h5">UCZESTNIK</div>
+              <div class="h3">{USER_NAME}</div>
+            </div>
+
+            <div class="block">
+              <div class="h5">DATA</div>
+              <div class="h3">{DATE}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="img">
+          <img src="qr.svg" width=100/>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
