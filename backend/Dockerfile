@@ -20,21 +20,12 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 RUN npm ci;
 
-# COPY . /app
-#
-# RUN npx esbuild --bundle --platform=node --outfile=dist/entry.js --packages=external backend/entry.ts
-#
-# RUN ls -la dist .
-#
-# COPY ./backend/entrypoint.sh /app/entry
-#
-#
-# ENTRYPOINT ["bash", "/app/entry"]
+COPY . /app
 
-COPY _billy/puppeteer.js puppeteer.js
+RUN npx esbuild --bundle --platform=node --outfile=dist/entry.js --packages=external backend/entry.ts
 
-COPY backend backend
+RUN ls -la dist .
 
-ENV PUPPETEER_BIN=/bin/chromium
+COPY ./backend/entrypoint.sh /app/entry
 
-CMD ["puppeteer.js"]
+ENTRYPOINT ["bash", "/app/entry"]
