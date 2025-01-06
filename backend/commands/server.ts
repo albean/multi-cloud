@@ -7,7 +7,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(`${process.cwd()}/public`));
+app.use('/files', express.static('public'))
 
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'Hello World v1237' });
@@ -29,14 +29,25 @@ app.post('/order', async (req: Request, res: Response) => {
 app.get('/pdf', async (req: Request, res: Response) => {
   const data = req.body;
 
-  pdfrender();
+  try {
+    await pdfrender();
+  } catch(e) {
+
+    console.error(e)
+    res.json({ status: "error!", error: e });
+    return;
+  }
 
   res.json({ status: "rendered!" });
 });
 
 const port = 8080;
 
-export const server = () => {
+export const server = async () => {
+  console.log("Rendering..")
+  await pdfrender();
+  console.log("Rendered!")
+
   app.listen(port, () => {
     console.log(`Server running on port ${port}`);
   });
