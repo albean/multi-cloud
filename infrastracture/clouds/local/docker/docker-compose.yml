@@ -83,6 +83,13 @@ services:
     ports:
       - "4171:4171"
 
+  mailcatcher:
+    restart: on-failure
+    image: dockage/mailcatcher:0.9.0
+    ports:
+    - "1080:1080"
+    - "1025:1025"
+
 networks:
   net1:
     ipam:
