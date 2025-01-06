@@ -31,7 +31,7 @@ app.post('/buy', async (req: Request, res: Response) => {
     eventId: event.id,
     // @FIXME Insert real values
     firstName: "john",
-    firstName: "johis",
+    lastName: "smith",
   }
 
   console.log(event);

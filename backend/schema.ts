@@ -8,6 +8,7 @@ export const orders = p.pgTable("orders", {
   id: p.serial().primaryKey(),
   email: p.text().notNull(),
   firstName: p.text().notNull(),
+  lastName: p.text().notNull(),
   eventId: p.integer().notNull(),
 });
 
