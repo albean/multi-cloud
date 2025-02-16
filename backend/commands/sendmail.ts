@@ -1,33 +1,51 @@
 // @TEMP
+import { getEnv } from 'common/utils';
 import nodemailer from 'nodemailer';
 
-export const sendmail = async () => {
-  console.log(process.env.SMTP_PASS)
+export const sendmail = async (email: string, attachment: string, subject: string) => {
+  // const transporter = nodemailer.createTransport({
+  //   host: "poczta1.mat.umk.pl",
+  //   port: 587,
+  //   auth: {
+  //     user: "lasek",
+  //     pass: process.env.SMTP_PASS,
+  //   },
+  // });
+
   const transporter = nodemailer.createTransport({
-    host: "poczta1.mat.umk.pl",
-    port: 587,
+    host: getEnv("SMTP_HOST"),
+    port: parseInt(getEnv("SMTP_PORT")),
     auth: {
-      user: "lasek",
-      pass: process.env.SMTP_PASS,
+      user: getEnv("SMTP_USER"),
+      pass: getEnv("SMTP_PASS"),
     },
   });
 
   const mailOptions = {
-    from: 'lasek@mat.umk.pl',
-    to: 'lasek.accounts@icloud.com',
-    subject: 'Subject of the email',
-    text: 'Body of the email',
+    from: 'lasek.accounts@icloud.com',
+    to: email,
+    subject: subject,
+    text: subject,
     attachments: [
-      {
-        filename: 'attachment.pdf',
-        path: 'public/businesscard.pdf',
-      },
+      { filename: 'attachment.pdf', path: attachment },
     ],
   };
 
-  console.log("Sending")
+  console.log("Sending DELIVERED", mailOptions)
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (e) {
+    console.error(e);
+  }
+
 
   console.log("Done")
+}
+
+interface Mail {
+  subject: string;
+  to: string;
+  text: string;
+  texattachments: string[];
 }

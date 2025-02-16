@@ -21,6 +21,20 @@ const defState: State = {
 export const EventList = () => {
   const [modal, setModal] = useState<State>({ ...defState });
 
+  const [formValues, setFormValues] = useState({
+    firstName: 'Jan',
+    lastName: 'Kowalski',
+    mail: 'jan.kowalis@fbi.com'
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      [name]: value
+    }));
+  };
+
   const close = (e: MouseEvent) => {
     if (e.target === e.currentTarget) {
       setModal(defState)
@@ -70,9 +84,9 @@ export const EventList = () => {
 
               <div>
                 <div className="mb-2 block">
-                  <FB.Label htmlFor="email1" value="E-Mail" />
+                  <FB.Label htmlFor="mail" value="E-Mail" />
                 </div>
-                <FB.TextInput id="email1" type="email" placeholder="jan.kowalski@wp.pl" value="jan.kowalski@wp.pl" required />
+                <FB.TextInput name="mail" type="email" placeholder="jan.kowalski@wp.pl" value={formValues.mail} required onChange={handleChange} />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -80,23 +94,26 @@ export const EventList = () => {
                   <div className="mb-2 block">
                     <FB.Label htmlFor="firstName" value="Imie" />
                   </div>
-                  <FB.TextInput id="firstName" type="email" placeholder="Jan" value="Jan" required />
+                  <FB.TextInput name="firstName" type="email" placeholder="Jan" value={formValues.firstName} required />
                 </div>
 
                 <div>
                   <div className="mb-2 block">
                     <FB.Label htmlFor="lastName" value="Nazwisko" />
                   </div>
-                  <FB.TextInput id="lastName" type="email" placeholder="Kowalski" value="Kowalski" required />
+                  <FB.TextInput name="lastName" type="email" placeholder="Kowalski" value={formValues.lastName} required />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-2">
-                  <Button className="" onClick={() => {
+                  <Button className="" onClick={async () => {
                     setModal(s => ({ ...s, loading: true }));
 
-                    buyTicket(modal.event!.id)
+                    await axios.post(`${EVENTS_BACKEND_PREFIX}/buy`, {
+                      id: modal.event!.id,
+                      ...formValues,
+                    });
                   }}>
                     Złóż zamówienie
                   </Button>
@@ -112,6 +129,5 @@ export const EventList = () => {
   )
 }
 
-const buyTicket = async (id: number) => {
-  await axios.post(`${EVENTS_BACKEND_PREFIX}/buy`, { id });
-};
+
+

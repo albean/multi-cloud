@@ -1,14 +1,47 @@
 import { Resource } from "../common/Resource";
 
-export const BuildType = Symbol("BuildType");
-export const Build = Resource<{ path: string }>()(BuildType, {});
-export type Build = ReturnType<typeof Build>;
+// export const BuildType = Symbol("BuildType");
+// export const Build = Resource<{ path: string }>()(BuildType, {});
+// export type Build = ReturnType<typeof Build>;
+//
+// export const ContainerType = Symbol("ContainerType");
+// export const Container = Resource<{ build: Build }>()(ContainerType, {
+//   expose: (_, domain: string) => {
+//     console.log("Hello!", { domain })
+//   }
+// });
 
-export const ContainerType = Symbol("ContainerType");
+export const QueueType = Symbol("QueueType");
+export const Queue = Resource<{ name: string }>()(QueueType, {});
+export type Queue = Resource<typeof QueueType, {}>
 
-export const Container = Resource<{ build: Build }>()(ContainerType, {
-  expose: (_, domain: string) => {
-    console.log("Hello!", { domain })
+
+
+export const SecretType = Symbol("SecretType");
+export const Secret = Resource<{ name: string }>()(SecretType, {
+  key: (secret, key: string) => {
+    return SecretKey({ secret, key });
   }
 });
+export type Secret = Resource<typeof SecretType, {}>
 
+export const SecretKeyType = Symbol("SecretKeyType");
+export const SecretKey = Resource<{ secret: Secret, key: string }>()(SecretKeyType, {});
+export type SecretKey = Resource<typeof SecretKeyType, {}>
+
+export const ServiceType = Symbol("ServiceType");
+export const Service = Resource<{
+  secrets: { name: string, secret: SecretKey }[];
+  command: string;
+  memory?: number;
+  expose?: boolean;
+}>()(ServiceType, {
+  consume: (service, queue: Queue) => {
+    return QueueConsumer({ service, queue });
+  }
+});
+export type Service = Resource<typeof ServiceType, {}>
+
+export const QueueConsumerType = Symbol("QueueConsumerType");
+export const QueueConsumer = Resource<{ queue: Queue, service: Service }>()(QueueConsumerType, {});
+export type QueueConsumer = Resource<typeof QueueConsumerType, {}>

@@ -1,5 +1,4 @@
 import { digest } from "infrastracture/common/Resource";
-import { Build, BuildType, ContainerType } from "infrastracture/resources";
 import { ShellProvider } from ".gen/providers/shell/provider";
 import { Script } from ".gen/providers/shell/script";
 import { App, TerraformStack } from "cdktf";
@@ -18,10 +17,12 @@ const tfResourceToFunc = <T, Args extends any[]>(Klass: Constructor<T, Args>): (
 
 // @see https://registry.terraform.io/providers/hashicorp/google/6.14.1/docs/resources/cloud_run_v2_service google_cloud_run_v2_service
 export const CloudRun = tfResourceToFunc(CloudRunV2Service);
+export type CloudRun = CloudRunV2Service;
 
 export const CloudBuildTrigger = tfResourceToFunc(CloudbuildTrigger);
 export const CloudBuildRepository = tfResourceToFunc(Cloudbuildv2Repository);
 export const ServiceAccountIamBinding = tfResourceToFunc(gcloud.serviceAccountIamBinding.ServiceAccountIamBinding);
+export const ServiceAccount = tfResourceToFunc(gcloud.serviceAccount.ServiceAccount);
 export const ProjectIamMember = tfResourceToFunc(gcloud.projectIamMember.ProjectIamMember);
 export const ArtifactRegistryRepository = tfResourceToFunc(gcloud.artifactRegistryRepository.ArtifactRegistryRepository);
 export const CloudRunServiceIamBinding = tfResourceToFunc(gcloud.cloudRunServiceIamBinding.CloudRunServiceIamBinding);
@@ -29,6 +30,13 @@ export const SqlDatabase = tfResourceToFunc(gcloud.sqlDatabase.SqlDatabase);
 export const SqlDatabaseInstance = tfResourceToFunc(gcloud.sqlDatabaseInstance.SqlDatabaseInstance);
 export const SqlUser = tfResourceToFunc(gcloud.sqlUser.SqlUser);
 export const SecretManagerSecret = tfResourceToFunc(gcloud.secretManagerSecret.SecretManagerSecret);
+
+export const PubsubTopic = tfResourceToFunc(gcloud.pubsubTopic.PubsubTopic);
+export type PubsubTopic = gcloud.pubsubTopic.PubsubTopic;
+
+// Represents a {@link https://registry.terraform.io/providers/hashicorp/google/6.14.1/docs/resources/pubsub_subscription google_pubsub_subscription}
+export const PubsubSubscription = tfResourceToFunc(gcloud.pubsubSubscription.PubsubSubscription);
+
 export const Out = tfResourceToFunc(TerraformOutput);
 
 export const location = "europe-west1";

@@ -38,3 +38,25 @@ export function run(cmdWithArgs: string[]): Promise<string> {
     });
   });
 }
+
+export const getEnv = (name: string): string => {
+  const value = process.env[name];
+  if (value === undefined) {
+    throw new Error(`Environment Varible ${name} is not set.`)
+  }
+
+  return value;
+};
+
+export const singletone = <T>(fac: () => T): () => T => {
+  let instance: T;
+
+  return () => {
+    if (!instance) {
+      instance = fac();
+    }
+    return instance;
+  };
+};
+
+

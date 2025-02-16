@@ -24,7 +24,7 @@ export const fixtures = async () => {
 
 const declaredFixtures = [
   {
-    name: "insert-events-v1",
+    name: "insert-events-v2",
     fn: eventsFixture,
   },
 ]

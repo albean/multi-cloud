@@ -1,5 +1,4 @@
 import { digest } from "infrastracture/common/Resource";
-import { Build, BuildType, ContainerType } from "infrastracture/resources";
 import { ShellProvider } from ".gen/providers/shell/provider";
 import { Script } from ".gen/providers/shell/script";
 import { App, TerraformStack } from "cdktf";

@@ -11,9 +11,9 @@ export const ContainerImpl = implement(
 
     await run(["docker", "rm", "-f", name])
 
-    const cmd = ["docker", "run", "-p", "80:80", "--name", name, "-d", build.imageId];
+    // const cmd = ["docker", "run", "-p", "80:80", "--name", name, "-d", build.imageId];
 
-    await run(cmd)
+    // await run(cmd)
 
     return {};
   }

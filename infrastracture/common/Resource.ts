@@ -4,6 +4,7 @@ const Values = new Map() as Map<any, any>;
 export type Resource<S extends symbol, Props> = {
   _symbol: S,
   _props: Props,
+  // _attr: Attr,
 }
 
 type Extension<T extends Record<string, (...args: any[]) => {}>> = {
@@ -22,7 +23,6 @@ export const Resource = <P>() =>
       Object.entries(extension).map(([k, v]) => {
         resource[k] = (...args: any) => extension[k](resource as any, ...args) as any
       })
-
 
       return resource as any;
     };

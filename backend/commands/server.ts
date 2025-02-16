@@ -1,8 +1,10 @@
 import express, { Request, Response } from 'express';
 import { events, db, OrderFields } from "backend/schema"
 import cors from 'cors';
-import { pdfrender } from 'backend/routes/renderpdf';
 import { eq } from 'drizzle-orm';
+import { renderPdf } from 'backend/services/pdf/render';
+import { sendmail } from './sendmail';
+import { ctx } from 'backend/Context';
 
 const app = express();
 
@@ -27,40 +29,20 @@ app.post('/buy', async (req: Request, res: Response) => {
 
   const event = (await db.select().from(events).where(eq(events.id, data.id)))[0];
 
-  const order: OrderFields = {
-    eventId: event.id,
-    // @FIXME Insert real values
-    firstName: "john",
-    lastName: "smith",
-  }
+  ctx.mailQueue.send({
+    mail: data.mail,
+    fullName: `${data.firstName} ${data.lastName}`,
+    eventId: data.id,
+  })
 
-  console.log(event);
+  console.log("Message send to queue...")
 
   res.json({ status: "sucess" });
-});
-
-app.get('/pdf', async (req: Request, res: Response) => {
-  const data = req.body;
-
-  try {
-    await pdfrender();
-  } catch(e) {
-
-    console.error(e)
-    res.json({ status: "error!", error: e });
-    return;
-  }
-
-  res.json({ status: "rendered!" });
 });
 
 const port = 8080;
 
 export const server = async () => {
-  console.log("Rendering..")
-  await pdfrender();
-  console.log("Rendered!")
-
   app.listen(port, () => {
     console.log(`Server running on port ${port}`);
   });

@@ -1,12 +1,8 @@
 echo "BILLY envs"
 
-env
-echo "------------------------------------"
-ls -la /
-echo "------------------------------------"
 pwd
 echo "------------------------------------"
-ls -la
+env
 echo "------------------------------------"
 
 export DATABASE_URL="postgresql://${DB_USER}:${DB_PASS}@${DB_HOST}/${DB_NAME}"
@@ -15,14 +11,20 @@ migrate() {
   npx drizzle-kit migrate
 }
 
-serve() {
+server() {
+  migrate
+  command fixtures
   node dist/entry.js server
 }
 
 command() {
-  node dist/entry.js $1
+  node dist/entry.js $@
 }
 
-migrate
-command fixtures
-serve
+consume() {
+  command consume
+}
+
+echo "VQ_96"
+
+$@
