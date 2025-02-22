@@ -168,9 +168,7 @@ const PipelineImplementation = implement(Pipeline, (p): {  } => {
         {
           name: "gcr.io/google.com/cloudsdktool/cloud-sdk",
           script: [
-            `ls -la`,
             `export IMAGE=$(cat image.txt)`,
-            // `export IMAGE="europe-central2-docker.pkg.dev/ultimate-life-396919/backend:250222-f9e0551436"`,
             `echo "Deploying location $IMAGE"`,
             ...p.services.map(_ => $gcloud(_)).flatMap(s => [
               `echo "------------"`,
@@ -211,7 +209,7 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
     template: {
       scaling: { maxInstanceCount: 1, minInstanceCount: 0 },
       containers: [{
-        image: `${$gcloud(p.repo.repo).url}${p.repo.path}:250222-f9e0551436`,
+        image: `${$gcloud(p.repo.repo).url}${p.repo.path}:250222-8dccdb1918`,
         command: ["bash", "/app/entry", p.command],
         // image: `us-docker.pkg.dev/cloudrun/container/hello`,
         resources: { limits: {
