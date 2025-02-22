@@ -140,12 +140,21 @@ const SecretKeyImplementation = implement(SecretKey, (p): { id: string } => {
 const PipelineImplementation = implement(Pipeline, (p): {  } => {
   const image = `${$gcloud(p.repo.repo).url}${p.repo.path}`;
 
+  const envs = p.args ?
+    Object.entries(p.args).map(([k,v]) => `_ARG_${k}=${v}`)
+  : [];
+
+  const args = p.args ?
+    Object.entries(p.args).map(([k,v]) => `--build-arg "${k}=$_ARG_${k}"`).join(" ")
+  : "";
+
+
   gcloud.CloudBuildTrigger(`pipeline-${p.name}`, {
     name: p.name,
     location,
     repositoryEventConfig: {
       repository: repo.id,
-      push: { branch: "main" }
+      push: { branch: "main" },
     },
     buildAttribute: {
       step: [
@@ -153,17 +162,17 @@ const PipelineImplementation = implement(Pipeline, (p): {  } => {
           name: "gcr.io/cloud-builders/docker",
           script: [
             `set -e`,
-            `docker build --platform linux/amd64 --progress plain -t image -f ${p.dockerfile} .`,
+            `docker build --platform linux/amd64 --progress plain -t image -f ${p.dockerfile} ${args} .`,
             "echo 'Building...'",
             `export TAG="$(date +%y%m%d)-$(openssl rand -hex 16 | head -c 10)"`,
             "echo $REPO:$TAG",
             "docker tag image $REPO:$TAG",
             "docker push $REPO:$TAG",
-            "docker push $REPO:latest",
             "echo $REPO:$TAG > image.txt",
           ].join(";\n"),
           env: [
             `REPO=${image}`,
+            ...envs,
           ]
         },
         {

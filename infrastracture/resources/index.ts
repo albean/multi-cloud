@@ -50,6 +50,7 @@ export type QueueConsumer = Resource<typeof QueueConsumerType, {}>
 interface PipelineProps {
   name: string,
   dockerfile: string,
+  args?: Record<string, string>,
   services: Service[],
   repo: DockerRepositoryPath;
 }
