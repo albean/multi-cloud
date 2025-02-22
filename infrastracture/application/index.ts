@@ -43,6 +43,7 @@ export const Application = () => {
   consumer.consume(mailQueue)
 
   const pipeline = Pipeline({
+    name: "backend",
     repo: backendRepoPath,
     dockerfile: "backend/Dockerfile",
     services: [service, consumer],
@@ -58,6 +59,7 @@ export const Application = () => {
   });
 
   Pipeline({
+    name: "frontend",
     repo: frontendRepoPath,
     dockerfile: "fronetnd/Dockerfile",
     services: [frontend],

@@ -140,8 +140,8 @@ const SecretKeyImplementation = implement(SecretKey, (p): { id: string } => {
 const PipelineImplementation = implement(Pipeline, (p): {  } => {
   const image = `${$gcloud(p.repo.repo).url}${p.repo.path}`;
 
-  gcloud.CloudBuildTrigger("pipeline", {
-    name: "backend-build",
+  gcloud.CloudBuildTrigger(`pipeline-${p.name}`, {
+    name: p.name,
     location,
     repositoryEventConfig: {
       repository: repo.id,
@@ -152,7 +152,7 @@ const PipelineImplementation = implement(Pipeline, (p): {  } => {
         {
           name: "gcr.io/cloud-builders/docker",
           script: [
-            "docker build --platform linux/amd64 --progress plain -t backend -f backend/Dockerfile .",
+            `docker build --platform linux/amd64 --progress plain -t backend -f ${p.dockerfile} .`,
             "echo 'Building...'",
             `export TAG="$(date +%y%m%d)-$(openssl rand -hex 16 | head -c 10)"`,
             "echo $REPO:$TAG",

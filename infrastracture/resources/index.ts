@@ -1,18 +1,5 @@
 import { Resource } from "../common/Resource";
 
-// export const BuildType = Symbol("BuildType");
-// export const Build = Resource<{ path: string }>()(BuildType, {});
-// export type Build = ReturnType<typeof Build>;
-//
-// export const ContainerType = Symbol("ContainerType");
-// export const Container = Resource<{ build: Build }>()(ContainerType, {
-//   expose: (_, domain: string) => {
-//     console.log("Hello!", { domain })
-//   }
-// });
-
-
-
 export const QueueType = Symbol("QueueType");
 export const Queue = Resource<{ name: string }>()(QueueType, {});
 export type Queue = Resource<typeof QueueType, {}>
@@ -61,8 +48,9 @@ export const QueueConsumer = Resource<{ queue: Queue, service: Service }>()(Queu
 export type QueueConsumer = Resource<typeof QueueConsumerType, {}>
 
 interface PipelineProps {
-  services: Service[],
+  name: string,
   dockerfile: string,
+  services: Service[],
   repo: DockerRepositoryPath;
 }
 export const PipelineType = Symbol("PipelineType");
