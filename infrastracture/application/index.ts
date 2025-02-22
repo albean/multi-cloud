@@ -24,6 +24,7 @@ export const Application = () => {
   ];
 
   const service = Service({
+    name: "backend-server",
     repo: backendRepoPath,
     secrets,
     command: "server",
@@ -31,6 +32,7 @@ export const Application = () => {
   });
 
   const consumer = Service({
+    name: "backend-consume",
     repo: backendRepoPath,
     secrets,
     command: "consume",
@@ -46,14 +48,14 @@ export const Application = () => {
     services: [service, consumer],
   })
 
-  const frontend = Service({
-    repo: frontendRepoPath,
-    command: "frontend",
-    expose: true,
-    env: [
-      { name: "SERVER_URL", value: service.exposedUrl }
-    ]
-  });
+  // const frontend = Service({
+  //   repo: frontendRepoPath,
+  //   command: "frontend",
+  //   expose: true,
+  //   env: [
+  //     { name: "SERVER_URL", value: service.exposedUrl }
+  //   ]
+  // });
 
   // Pipeline({
   //   dockerfile: "fronetnd/Dockerfile",

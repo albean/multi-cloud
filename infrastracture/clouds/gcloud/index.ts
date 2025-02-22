@@ -158,6 +158,7 @@ const PipelineImplementation = implement(Pipeline, (p): {  } => {
             "echo $REPO:$TAG",
             "docker tag backend $REPO:$TAG",
             "docker push $REPO:$TAG",
+            "docker push $REPO:latest",
             "echo $REPO:$TAG > image.txt",
           ].join(";\n"),
           env: [
@@ -199,18 +200,18 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
     });
   })
 
-  const name = `backend-svc-${p.command}`;
+  const name = `svc-${p.name}`;
   const memory = `${p.memory ?? 1}Gi`;
 
   const service = gcloud.CloudRun(name, {
-    name: `tf-app-${p.command}`,
+    name: `app-${p.name}`,
     location,
     ingress: "INGRESS_TRAFFIC_ALL",
     deletionProtection: false,
     template: {
       scaling: { maxInstanceCount: 1, minInstanceCount: 0 },
       containers: [{
-        // image: `${$gcloud(p.repo.repo).url}${p.repo.path}`,
+        // image: `${$gcloud(p.repo.repo).url}${p.repo.path}:latest`,
         // command: ["bash", "/app/entry", p.command],
         image: `us-docker.pkg.dev/cloudrun/container/hello`,
         resources: { limits: {

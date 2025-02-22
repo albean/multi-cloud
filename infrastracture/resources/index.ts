@@ -33,6 +33,7 @@ export type SecretKey = Resource<typeof SecretKeyType, {}>
 export const ServiceType = Symbol("ServiceType");
 export const Service = Resource<{
   repo: DockerRepositoryPath;
+  name: string;
   command: string;
   secrets?: { name: string, secret: SecretKey }[];
   env?: { name: string, value: string }[];
