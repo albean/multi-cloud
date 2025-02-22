@@ -173,8 +173,11 @@ const PipelineImplementation = implement(Pipeline, (p): {  } => {
             `export IMAGE="europe-central2-docker.pkg.dev/ultimate-life-396919/backend/main:250222-71ae64ecef"`,
             `echo "Deploying location $IMAGE"`,
             p.services.map(_ => $gcloud(_)).flatMap(s => [
+              `echo "------------"`,
+              `echo "IMAGE: $IMAGE"`,
               `echo 'gcloud run deploy ${s.tfService.name} --image $IMAGE --region ${location}'`,
               `gcloud run deploy ${s.tfService.name} --image $IMAGE --region ${location}`,
+              `echo "------------"`,
             ]),
           ].join(";\n"),
         },
