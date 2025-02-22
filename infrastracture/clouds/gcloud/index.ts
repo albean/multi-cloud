@@ -152,6 +152,7 @@ const PipelineImplementation = implement(Pipeline, (p): {  } => {
         {
           name: "gcr.io/cloud-builders/docker",
           script: [
+            `set -e`,
             `docker build --platform linux/amd64 --progress plain -t image -f ${p.dockerfile} .`,
             "echo 'Building...'",
             `export TAG="$(date +%y%m%d)-$(openssl rand -hex 16 | head -c 10)"`,
@@ -168,6 +169,7 @@ const PipelineImplementation = implement(Pipeline, (p): {  } => {
         {
           name: "gcr.io/google.com/cloudsdktool/cloud-sdk",
           script: [
+            `set -e`,
             `export IMAGE=$(cat image.txt)`,
             `echo "Deploying location $IMAGE"`,
             ...p.services.map(_ => $gcloud(_)).flatMap(s => [
