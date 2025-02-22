@@ -149,28 +149,26 @@ const PipelineImplementation = implement(Pipeline, (p): {  } => {
     },
     buildAttribute: {
       step: [
-        // {
-        //   name: "gcr.io/cloud-builders/docker",
-        //   script: [
-        //     "docker build --platform linux/amd64 --progress plain -t backend -f backend/Dockerfile .",
-        //     "echo 'Building...'",
-        //     `export TAG="$(date +%y%m%d)-$(openssl rand -hex 16 | head -c 10)"`,
-        //     "echo $REPO:$TAG",
-        //     "docker tag backend $REPO:$TAG",
-        //     "docker push $REPO:$TAG",
-        //     "echo $REPO:$TAG > image.txt",
-        //   ].join(";\n"),
-        //   env: [
-        //     `REPO=${image}`,
-        //   ]
-        // },
+        {
+          name: "gcr.io/cloud-builders/docker",
+          script: [
+            "docker build --platform linux/amd64 --progress plain -t backend -f backend/Dockerfile .",
+            "echo 'Building...'",
+            `export TAG="$(date +%y%m%d)-$(openssl rand -hex 16 | head -c 10)"`,
+            "echo $REPO:$TAG",
+            "docker tag backend $REPO:$TAG",
+            "docker push $REPO:$TAG",
+            "echo $REPO:$TAG > image.txt",
+          ].join(";\n"),
+          env: [
+            `REPO=${image}`,
+          ]
+        },
         {
           name: "gcr.io/google.com/cloudsdktool/cloud-sdk",
           script: [
             `ls -la`,
-            // @FIXME image
-            // `export IMAGE=$(cat image.txt)`,
-            `export IMAGE="europe-central2-docker.pkg.dev/ultimate-life-396919/backend/main:250222-71ae64ecef"`,
+            `export IMAGE=$(cat image.txt)`,
             `echo "Deploying location $IMAGE"`,
             p.services.map(_ => $gcloud(_)).flatMap(s => [
               `echo "------------"`,
