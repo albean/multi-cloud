@@ -1,5 +1,17 @@
 import { digest, implement } from "infrastracture/common/Resource";
-import { Service, Secret, Queue, QueueType, SecretType, SecretKeyType, SecretKey, QueueConsumer, ServiceType } from "infrastracture/resources";
+import {
+  Service,
+  Secret,
+  Queue,
+  QueueType,
+  SecretType,
+  SecretKeyType,
+  SecretKey,
+  QueueConsumer,
+  ServiceType,
+  Pipeline,
+  PipelineType,
+} from "infrastracture/resources";
 import { ShellProvider } from ".gen/providers/shell/provider";
 import { Script } from ".gen/providers/shell/script";
 import { App, TerraformStack } from "cdktf";
@@ -88,49 +100,6 @@ const tag = `${dockerRepo.location}-docker.pkg.dev/${project}/${dockerRepo.name}
 
 gcloud.Out("image", { value: image })
 
-// gcloud.CloudBuildTrigger("trigger", {
-//   name: "backend-build",
-//   location,
-//   repositoryEventConfig: {
-//     repository: repo.id,
-//     push: { branch: "main" }
-//   },
-//   buildAttribute: {
-//     step: [
-//       {
-//         name: "gcr.io/cloud-builders/docker",
-//         script: [
-//           "docker build --platform linux/amd64 --progress plain -t backend -f backend/Dockerfile .",
-//           "echo 'Building...'",
-//           `export TAG="$(date +%y%m%d)-$(openssl rand -hex 16 | head -c 10)"`,
-//           "echo $REPO:$TAG",
-//           "docker tag backend $REPO:$TAG",
-//           "docker push $REPO:$TAG",
-//           "echo $REPO:$TAG > image.txt",
-//         ].join(";\n"),
-//         env: [
-//           `REPO=${image}`,
-//         ]
-//       },
-//       {
-//         name: "gcr.io/google.com/cloudsdktool/cloud-sdk",
-//         script: [
-//           `ls -la`,
-//           `export IMAGE=$(cat image.txt)`,
-//           `echo "Deploying location $IMAGE"`,
-//           `gcloud run deploy ${service.name} --image $IMAGE --region ${location}`,
-//         ].join(";\n"),
-//       },
-//       {
-//         name: "ghcr.io/nushell/nushell:latest-alpine",
-//         script: [
-//           "nu -c 'ls /usr/bin | where size > 10KiB'",
-//         ].join(";\n")
-//       },
-//     ],
-//   },
-// });
-
 
 // gcloud.Out("service-url", { value: service.uri })
 
@@ -168,6 +137,54 @@ const SecretKeyImplementation = implement(SecretKey, (p): { id: string } => {
   });
 
   return { id: secret.id };
+})
+
+const PipelineImplementation = implement(Pipeline, (p): {  } => {
+  gcloud.CloudBuildTrigger("pipeline", {
+    name: "backend-build",
+    location,
+    repositoryEventConfig: {
+      repository: repo.id,
+      push: { branch: "main" }
+    },
+    buildAttribute: {
+      step: [
+        {
+          name: "gcr.io/cloud-builders/docker",
+          script: [
+            "docker build --platform linux/amd64 --progress plain -t backend -f backend/Dockerfile .",
+            "echo 'Building...'",
+            `export TAG="$(date +%y%m%d)-$(openssl rand -hex 16 | head -c 10)"`,
+            "echo $REPO:$TAG",
+            "docker tag backend $REPO:$TAG",
+            "docker push $REPO:$TAG",
+            "echo $REPO:$TAG > image.txt",
+          ].join(";\n"),
+          env: [
+            `REPO=${image}`,
+          ]
+        },
+        {
+          name: "gcr.io/google.com/cloudsdktool/cloud-sdk",
+          script: [
+            `ls -la`,
+            `export IMAGE=$(cat image.txt)`,
+            `echo "Deploying location $IMAGE"`,
+            p.services.map(_ => $gcloud(_)).map(s =>
+              `gcloud run deploy ${s.tfService.name} --image $IMAGE --region ${location}`,
+            ),
+          ].join(";\n"),
+        },
+        {
+          name: "ghcr.io/nushell/nushell:latest-alpine",
+          script: [
+            "nu -c 'ls /usr/bin | where size > 10KiB'",
+          ].join(";\n")
+        },
+      ],
+    },
+  });
+  return {};
 })
 
 const ServiceImplementation = implement(Service, (p): { name: string, tfService: gcloud.CloudRun } => {
@@ -255,7 +272,6 @@ const QueueConsumerImplementation = implement(QueueConsumer, (p): {} => {
     }
   })
 
-
   return {};
 })
 
@@ -263,6 +279,7 @@ export const $gcloud = digest({
   [QueueType]: QueueImpementation,
   [SecretType]: SecretImplementation,
   [SecretKeyType]: SecretKeyImplementation,
+  [PipelineType]: PipelineImplementation,
   [ServiceType]: ServiceImplementation,
 
   // @FIXME Should be checked!

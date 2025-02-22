@@ -1,4 +1,4 @@
-import { Queue, Secret, Service  } from "infrastracture/resources";
+import { Pipeline, Queue, Secret, Service  } from "infrastracture/resources";
 
 export const Application = () => {
   const secret = Secret({ name: "smtp" })
@@ -16,13 +16,17 @@ export const Application = () => {
     secrets,
     command: "server",
     expose: true,
-  })
+  });
 
   const consumer = Service({
     secrets,
     command: "consume",
     expose: false,
     memory: 4,
+  });
+
+  const pipeline = Pipeline({
+    services: [service, consumer],
   })
 
   consumer.consume(mailQueue)

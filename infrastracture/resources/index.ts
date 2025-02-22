@@ -15,8 +15,6 @@ export const QueueType = Symbol("QueueType");
 export const Queue = Resource<{ name: string }>()(QueueType, {});
 export type Queue = Resource<typeof QueueType, {}>
 
-
-
 export const SecretType = Symbol("SecretType");
 export const Secret = Resource<{ name: string }>()(SecretType, {
   key: (secret, key: string) => {
@@ -24,6 +22,7 @@ export const Secret = Resource<{ name: string }>()(SecretType, {
   }
 });
 export type Secret = Resource<typeof SecretType, {}>
+
 
 export const SecretKeyType = Symbol("SecretKeyType");
 export const SecretKey = Resource<{ secret: Secret, key: string }>()(SecretKeyType, {});
@@ -45,3 +44,10 @@ export type Service = Resource<typeof ServiceType, {}>
 export const QueueConsumerType = Symbol("QueueConsumerType");
 export const QueueConsumer = Resource<{ queue: Queue, service: Service }>()(QueueConsumerType, {});
 export type QueueConsumer = Resource<typeof QueueConsumerType, {}>
+
+interface PipelineProps {
+  services: Service[],
+}
+export const PipelineType = Symbol("PipelineType");
+export const Pipeline = Resource<PipelineProps>()(PipelineType, {});
+export type Pipeline = Resource<typeof PipelineType, {}>
