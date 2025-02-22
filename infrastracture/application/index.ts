@@ -48,19 +48,20 @@ export const Application = () => {
     services: [service, consumer],
   })
 
-  // const frontend = Service({
-  //   repo: frontendRepoPath,
-  //   command: "frontend",
-  //   expose: true,
-  //   env: [
-  //     { name: "SERVER_URL", value: service.exposedUrl }
-  //   ]
-  // });
+  const frontend = Service({
+    name: "frontend",
+    repo: frontendRepoPath,
+    expose: true,
+    env: [
+      { name: "SERVER_URL", value: service.exposedUrl }
+    ]
+  });
 
-  // Pipeline({
-  //   dockerfile: "fronetnd/Dockerfile",
-  //   services: [service, consumer],
-  // })
+  Pipeline({
+    repo: frontendRepoPath,
+    dockerfile: "fronetnd/Dockerfile",
+    services: [frontend],
+  })
 
 
   // Backend(props.domain)

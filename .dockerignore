@@ -2,4 +2,6 @@ node_modules/
 cdktf*
 dist/
 cdktf*
-Dockerfile
+*/Dockerfile
+build/
+
