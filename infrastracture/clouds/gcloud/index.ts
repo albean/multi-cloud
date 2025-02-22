@@ -170,7 +170,7 @@ const PipelineImplementation = implement(Pipeline, (p): {  } => {
             `ls -la`,
             `export IMAGE=$(cat image.txt)`,
             `echo "Deploying location $IMAGE"`,
-            p.services.map(_ => $gcloud(_)).flatMap(s => [
+            ...p.services.map(_ => $gcloud(_)).flatMap(s => [
               `echo "------------"`,
               `echo "IMAGE: $IMAGE"`,
               `echo 'gcloud run deploy ${s.tfService.name} --image $IMAGE --region ${location}'`,
