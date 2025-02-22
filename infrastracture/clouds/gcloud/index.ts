@@ -12,6 +12,8 @@ import {
   Pipeline,
   PipelineType,
 } from "infrastracture/resources";
+
+import * as res from "infrastracture/resources";
 import { ShellProvider } from ".gen/providers/shell/provider";
 import { Script } from ".gen/providers/shell/script";
 import { App, TerraformStack } from "cdktf";
@@ -90,15 +92,11 @@ gcloud.ServiceAccountIamBinding("iam-biding", {
   role: "roles/iam.serviceAccountUser",
 })
 
-const dockerRepo = gcloud.ArtifactRegistryRepository("repository", {
-  format: "docker",
-  repositoryId: "backend",
-})
 
-const image = `${dockerRepo.location}-docker.pkg.dev/${project}/${dockerRepo.name}/main`;
-const tag = `${dockerRepo.location}-docker.pkg.dev/${project}/${dockerRepo.name}/main:ts-0104`;
+// const image = `${dockerRepo.location}-docker.pkg.dev/${project}/${dockerRepo.name}/main`;
+// const tag = `${dockerRepo.location}-docker.pkg.dev/${project}/${dockerRepo.name}/main:ts-0104`;
 
-gcloud.Out("image", { value: image })
+// gcloud.Out("image", { value: image })
 
 
 // gcloud.Out("service-url", { value: service.uri })
@@ -140,6 +138,8 @@ const SecretKeyImplementation = implement(SecretKey, (p): { id: string } => {
 })
 
 const PipelineImplementation = implement(Pipeline, (p): {  } => {
+  const image = `${$gcloud(p.repo.repo).url}${p.repo.path}`;
+
   gcloud.CloudBuildTrigger("pipeline", {
     name: "backend-build",
     location,
@@ -168,12 +168,13 @@ const PipelineImplementation = implement(Pipeline, (p): {  } => {
           name: "gcr.io/google.com/cloudsdktool/cloud-sdk",
           script: [
             `ls -la`,
-            `export IMAGE=$(cat image.txt)`,
+            // `export IMAGE=$(cat image.txt)`,
+            `export IMAGE="europe-central2-docker.pkg.dev/ultimate-life-396919/backend/main:250222-f9e0551436"`,
             `echo "Deploying location $IMAGE"`,
             ...p.services.map(_ => $gcloud(_)).flatMap(s => [
               `echo "------------"`,
               `echo "IMAGE: $IMAGE"`,
-              `echo 'gcloud run deploy ${s.tfService.name} --image $IMAGE --region ${location}'`,
+              `echo "gcloud run deploy ${s.tfService.name} --image $IMAGE --region ${location}"`,
               `gcloud run deploy ${s.tfService.name} --image $IMAGE --region ${location}`,
               `echo "------------"`,
             ]),
@@ -182,10 +183,11 @@ const PipelineImplementation = implement(Pipeline, (p): {  } => {
       ],
     },
   });
+
   return {};
 })
 
-const ServiceImplementation = implement(Service, (p): { name: string, tfService: gcloud.CloudRun } => {
+const ServiceImplementation = implement(Service, (p): { name: string, tfService: gcloud.CloudRun, exposedUrl: string } => {
   const secretsEnvs: any[] = [];
 
   p.secrets?.forEach(s => {
@@ -208,13 +210,14 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
     template: {
       scaling: { maxInstanceCount: 1, minInstanceCount: 0 },
       containers: [{
-        image: tag,
+        // image: `${$gcloud(p.repo.repo).url}${p.repo.path}`,
+        // command: ["bash", "/app/entry", p.command],
+        image: `us-docker.pkg.dev/cloudrun/container/hello`,
         resources: { limits: {
           cpu: '1000m',
           memory,
         } },
         volumeMounts: [{ name: "cloudsql", mountPath: '/cloudsql' }],
-        command: ["bash", "/app/entry", p.command],
         env: [
           { name: "VER", value: "v23" },
 
@@ -226,6 +229,7 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
           { name: "DB_USER", value: user.name },
           { name: "DB_PASS", value: user.password },
           ...secretsEnvs,
+          ...(p.env ?? []),
         ],
       }],
       volumes: [{
@@ -238,7 +242,7 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
   });
 
   if (p.expose) {
-    gcloud.CloudRunServiceIamBinding("all-members", {
+    gcloud.CloudRunServiceIamBinding(`all-member-${p.command}`, {
       location: service.location,
       service: service.name,
       role: "roles/run.invoker",
@@ -246,7 +250,7 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
     })
   }
 
-  return { tfService: service, name };
+  return { tfService: service, name, exposedUrl: service.uri };
 })
 
 const QueueConsumerImplementation = implement(QueueConsumer, (p): {} => {
@@ -273,15 +277,23 @@ const QueueConsumerImplementation = implement(QueueConsumer, (p): {} => {
   return {};
 })
 
+const DockerRepositoryImplementation = implement(res.DockerRepository, (p): { url: string } => {
+  const dockerRepo = gcloud.ArtifactRegistryRepository(`repository-${p.name}`, {
+    format: "docker",
+    repositoryId: p.name,
+  })
+  return {
+    url: `${dockerRepo.location}-docker.pkg.dev/${project}/${dockerRepo.name}/`
+  };
+})
+
 export const $gcloud = digest({
   [QueueType]: QueueImpementation,
   [SecretType]: SecretImplementation,
   [SecretKeyType]: SecretKeyImplementation,
   [PipelineType]: PipelineImplementation,
   [ServiceType]: ServiceImplementation,
-
-  // @FIXME Should be checked!
-  [""]: QueueImpementation,
+  [res.DockerRepositoryType]: DockerRepositoryImplementation,
 })
 
 Application()

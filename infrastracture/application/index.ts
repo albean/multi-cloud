@@ -1,7 +1,18 @@
-import { Pipeline, Queue, Secret, Service  } from "infrastracture/resources";
+import {
+  Pipeline,
+  Queue,
+  Secret,
+  Service,
+  DockerRepository,
+  DockerRepositoryPath,
+} from "infrastracture/resources";
 
 export const Application = () => {
   const secret = Secret({ name: "smtp" })
+
+  const repo = DockerRepository({ name: "app" })
+  const backendRepoPath: DockerRepositoryPath = { repo, path: "backend" };
+  const frontendRepoPath: DockerRepositoryPath = { repo, path: "frontend" };
 
   const mailQueue = Queue({ name: "mail" })
 
@@ -13,23 +24,42 @@ export const Application = () => {
   ];
 
   const service = Service({
+    repo: backendRepoPath,
     secrets,
     command: "server",
     expose: true,
   });
 
   const consumer = Service({
+    repo: backendRepoPath,
     secrets,
     command: "consume",
     expose: false,
     memory: 4,
   });
 
+  consumer.consume(mailQueue)
+
   const pipeline = Pipeline({
+    repo: backendRepoPath,
+    dockerfile: "backend/Dockerfile",
     services: [service, consumer],
   })
 
-  consumer.consume(mailQueue)
+  const frontend = Service({
+    repo: frontendRepoPath,
+    command: "frontend",
+    expose: true,
+    env: [
+      { name: "SERVER_URL", value: service.exposedUrl }
+    ]
+  });
+
+  // Pipeline({
+  //   dockerfile: "fronetnd/Dockerfile",
+  //   services: [service, consumer],
+  // })
+
 
   // Backend(props.domain)
 }

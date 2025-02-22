@@ -11,6 +11,8 @@ import { Resource } from "../common/Resource";
 //   }
 // });
 
+
+
 export const QueueType = Symbol("QueueType");
 export const Queue = Resource<{ name: string }>()(QueueType, {});
 export type Queue = Resource<typeof QueueType, {}>
@@ -30,16 +32,28 @@ export type SecretKey = Resource<typeof SecretKeyType, {}>
 
 export const ServiceType = Symbol("ServiceType");
 export const Service = Resource<{
-  secrets: { name: string, secret: SecretKey }[];
+  repo: DockerRepositoryPath;
   command: string;
+  secrets?: { name: string, secret: SecretKey }[];
+  env?: { name: string, value: string }[];
   memory?: number;
   expose?: boolean;
+}, {
+  exposedUrl: string
 }>()(ServiceType, {
   consume: (service, queue: Queue) => {
     return QueueConsumer({ service, queue });
-  }
+  },
 });
 export type Service = Resource<typeof ServiceType, {}>
+
+export const DockerRepositoryType = Symbol("DockerRepositoryType");
+export const DockerRepository = Resource<{
+  name: string,
+}, {
+  url: string
+} >()(DockerRepositoryType, {});
+export type DockerRepository = Resource<typeof DockerRepositoryType, {}>
 
 export const QueueConsumerType = Symbol("QueueConsumerType");
 export const QueueConsumer = Resource<{ queue: Queue, service: Service }>()(QueueConsumerType, {});
@@ -47,7 +61,14 @@ export type QueueConsumer = Resource<typeof QueueConsumerType, {}>
 
 interface PipelineProps {
   services: Service[],
+  dockerfile: string,
+  repo: DockerRepositoryPath;
 }
 export const PipelineType = Symbol("PipelineType");
 export const Pipeline = Resource<PipelineProps>()(PipelineType, {});
 export type Pipeline = Resource<typeof PipelineType, {}>
+
+export interface DockerRepositoryPath {
+  repo: DockerRepository,
+  path: string,
+}
