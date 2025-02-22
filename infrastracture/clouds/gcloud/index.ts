@@ -152,11 +152,11 @@ const PipelineImplementation = implement(Pipeline, (p): {  } => {
         {
           name: "gcr.io/cloud-builders/docker",
           script: [
-            `docker build --platform linux/amd64 --progress plain -t backend -f ${p.dockerfile} .`,
+            `docker build --platform linux/amd64 --progress plain -t image -f ${p.dockerfile} .`,
             "echo 'Building...'",
             `export TAG="$(date +%y%m%d)-$(openssl rand -hex 16 | head -c 10)"`,
             "echo $REPO:$TAG",
-            "docker tag backend $REPO:$TAG",
+            "docker tag image $REPO:$TAG",
             "docker push $REPO:$TAG",
             "docker push $REPO:latest",
             "echo $REPO:$TAG > image.txt",

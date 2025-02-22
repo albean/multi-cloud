@@ -61,7 +61,7 @@ export const Application = () => {
   Pipeline({
     name: "frontend",
     repo: frontendRepoPath,
-    dockerfile: "fronetnd/Dockerfile",
+    dockerfile: "frontend/Dockerfile",
     services: [frontend],
   })
 
