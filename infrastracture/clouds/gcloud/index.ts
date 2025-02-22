@@ -175,12 +175,6 @@ const PipelineImplementation = implement(Pipeline, (p): {  } => {
             ),
           ].join(";\n"),
         },
-        {
-          name: "ghcr.io/nushell/nushell:latest-alpine",
-          script: [
-            "nu -c 'ls /usr/bin | where size > 10KiB'",
-          ].join(";\n")
-        },
       ],
     },
   });

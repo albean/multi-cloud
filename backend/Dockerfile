@@ -3,7 +3,10 @@ FROM node:slim
 
 # Install latest Chrome dev package and fonts to support major charsets
 RUN apt-get update \
-    && apt-get install -y chromium --no-install-recommends
+    && apt-get install -y chromium --no-install-recommends;
+
+
+RUN mkdir /app && chown node /app;
 
 # Run everything after as non-privileged user.
 USER node
