@@ -13,7 +13,7 @@ app.use(express.json());
 app.use('/files', express.static('public'))
 
 app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'Hello World v1238' });
+  res.json({ message: 'Hello World v1239' });
 });
 
 app.get('/events', async (req: Request, res: Response) => {
