@@ -18,3 +18,4 @@ http://front.localhost.tv:5000/
 - Frontend development - frontend does not have to relay on remote testing instance
 - Teting product on specefic branch - running local version is way easier
 - Multi-cloud - clouds are pretty new invetion - they still compete
+
