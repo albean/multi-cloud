@@ -88,7 +88,6 @@ const tag = `${dockerRepo.location}-docker.pkg.dev/${project}/${dockerRepo.name}
 
 gcloud.Out("image", { value: image })
 
-
 // gcloud.CloudBuildTrigger("trigger", {
 //   name: "backend-build",
 //   location,
