@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import { renderPdf } from 'backend/services/pdf/render';
 import { sendmail } from './sendmail';
 import { ctx } from 'backend/Context';
+import { getEnv } from 'common/utils';
 
 const app = express();
 
@@ -25,11 +26,12 @@ app.get('/events', async (req: Request, res: Response) => {
 app.post('/buy', async (req: Request, res: Response) => {
   const data = req.body;
 
-  console.log("BYING", data)
 
   const event = (await db.select().from(events).where(eq(events.id, data.id)))[0];
 
-  ctx.mailQueue.send({
+  console.log("BYING", data, event)
+
+  await ctx.mailQueue.send({
     mail: data.mail,
     fullName: `${data.firstName} ${data.lastName}`,
     eventId: data.id,
@@ -40,9 +42,17 @@ app.post('/buy', async (req: Request, res: Response) => {
   res.json({ status: "sucess" });
 });
 
-const port = 8080;
+const port = getEnv("PORT", "8080");
 
 export const server = async () => {
+
+  await ctx.mailQueue.send({
+    mail: "test@wp.pl",
+    fullName: `lol olo`,
+    eventId: 3,
+  })
+
+  // console.log("Success!")
   app.listen(port, () => {
     console.log(`Server running on port ${port}`);
   });

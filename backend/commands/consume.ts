@@ -5,6 +5,7 @@ import { sendmail } from "./sendmail";
 import { eq } from 'drizzle-orm';
 
 export const consume = async (queueName: string) => {
+  console.log("Consuming mail...")
   consumeMail();
 };
 

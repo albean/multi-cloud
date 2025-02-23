@@ -1,0 +1,8 @@
+{
+  "services": {
+    "nginx-legacy": {
+      "image": "nginx",
+      "ports": ["8069:80"]
+    }
+  }
+}

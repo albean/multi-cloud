@@ -39,8 +39,8 @@ export function run(cmdWithArgs: string[]): Promise<string> {
   });
 }
 
-export const getEnv = (name: string): string => {
-  const value = process.env[name];
+export const getEnv = (name: string, def?: string): string => {
+  const value = process.env[name] ?? def;
   if (value === undefined) {
     throw new Error(`Environment Varible ${name} is not set.`)
   }

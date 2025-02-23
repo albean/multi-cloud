@@ -15,7 +15,7 @@ COPY postcss.config.js /app
 
 RUN ls -la
 
-ARG BACKEND_PREFIX="https://app-backend-server-1087863064045.europe-west1.run.app/"
+ARG BACKEND_PREFIX="https://undefined"
 ENV BACKEND_PREFIX=$BACKEND_PREFIX
 
 RUN npx vite build;

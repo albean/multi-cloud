@@ -18,7 +18,7 @@ export const Resource = <P, A = {}>() =>
 
       const fn = impl[symbol];
 
-      const attr = fn(props);
+      const attr = fn ? fn(props) : {};
       Values.set(resource, attr);
 
       Object.entries(extension).map(([k, v]) => {

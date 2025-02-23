@@ -2,12 +2,15 @@ import { getEnv } from "common/utils";
 import { queueFactory, QueueFactory } from "./QueueFactory";
 import { NsqQueueFactory } from "./nsq/NsqQueueFactory";
 import { GooglePubsubQueueFactory } from "./pubsub/GooglePubsubQueueFactory";
+import { RedisQueueFactory } from "./redis/RedisQueueFactory";
 
 export const EnvBasedQueueFactorySetup = () => {
-  console.log("Setupping....")
   const queueBackend = getEnv("QUEUE_BACKEND");
+  console.log("Setuping Queue", { queueBackend })
   if (queueBackend === "nsq") {
     queueFactory.impl = NsqQueueFactory;
+  } else if (queueBackend === "redis") {
+    queueFactory.impl = RedisQueueFactory;
   } else if (queueBackend === "pubsub") {
     queueFactory.impl = GooglePubsubQueueFactory;
   } else {

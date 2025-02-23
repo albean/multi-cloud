@@ -1,9 +1,16 @@
+import { getEnv } from 'common/utils';
 import { connect, Reader, Writer } from 'nsqjs';
 
 
 export const NsqQueueFactory = (queueName: string): Queue<any> => {
+
+  const host = getEnv("QUEUE_HOST")
+  const port = 4160
+
+  console.log("NSQ", { host, port })
+
   const writer = new Promise<Writer>((cb, err) => {
-    const writer = new Writer('127.0.0.1', 4150);
+    const writer = new Writer(host, port);
     writer.connect()
 
     writer.on('ready', () => {
@@ -19,13 +26,14 @@ export const NsqQueueFactory = (queueName: string): Queue<any> => {
 
   return {
     send: async (msg) => {
+      console.log("NSQ: publishing...", { queueName });
       (await writer).publish(queueName, JSON.stringify(msg));
 
       console.log("SENT")
     },
     consume: async cb => {
       const reader = new Reader(queueName, "main", {
-        nsqdTCPAddresses: '127.0.0.1:4150'
+        nsqdTCPAddresses: `${host}:${port}`
       });
 
       reader.connect();
@@ -40,3 +48,5 @@ export const NsqQueueFactory = (queueName: string): Queue<any> => {
     }
   };
 };
+
+

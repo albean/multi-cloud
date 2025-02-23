@@ -60,7 +60,7 @@ export const Application = () => {
     repo: frontendRepoPath,
     dockerfile: "frontend/Dockerfile",
     services: [frontend],
-    args: { SERVER_URL: service.exposedUrl }
+    args: { BACKEND_PREFIX: service.exposedUrl }
   })
 
 
