@@ -20,15 +20,21 @@ export const RedisQueueFactory = (queueName: string) => {
     consume: async (cb) => {
       const processMessage = async () => {
         const msg = await client.lPop(queueName);
-          console.log("REDIS: listneing", { queueName })
         if (msg) {
           console.log("REDIS: Got message")
-          await cb(JSON.parse(msg));
-          processMessage();
+          try {
+            await cb(JSON.parse(msg));
+          } catch (e) {
+            console.error("REDIS: Error during processing message", e)
+          }
         }
+        await sleep(100)
+        processMessage();
       };
 
       processMessage();
     }
   };
 };
+
+const sleep = (ms: number) => new Promise(cb => setTimeout(cb, ms))

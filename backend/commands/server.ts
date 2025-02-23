@@ -46,13 +46,12 @@ const port = getEnv("PORT", "8080");
 
 export const server = async () => {
 
-  await ctx.mailQueue.send({
-    mail: "test@wp.pl",
-    fullName: `lol olo`,
-    eventId: 3,
-  })
+  // await ctx.mailQueue.send({
+  //   mail: "test@wp.pl",
+  //   fullName: `lol olo`,
+  //   eventId: 3,
+  // })
 
-  // console.log("Success!")
   app.listen(port, () => {
     console.log(`Server running on port ${port}`);
   });

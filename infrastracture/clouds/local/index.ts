@@ -44,6 +44,7 @@ const resource = <T>(id: string, command: string, env: Record<string, string>) =
 interface ComposeService {
   image?: string,
   build?: string | { context?: string, dockerfile: string },
+  restart?: "on-failure" | "always",
   ports?: string[],
   networks?: string[],
   command?: string[] | string,
@@ -108,6 +109,16 @@ ComposeService("redis", {
   ports: ['6379:6379']
 })
 
+ComposeService("mailcatcher", {
+  networks: ["backend"],
+  restart: 'on-failure',
+  image: 'dockage/mailcatcher:0.9.0',
+  ports: [
+    '1080:1080',
+    '1025:1025'
+  ]
+})
+
 const backend = ComposeService("postgres", {
   image: "postgres:latest",
   networks: ["backend"],
@@ -130,6 +141,7 @@ const ServiceImpl = implement(res.Service, (p): { exposedUrl: string, version: s
 
   const res = ComposeService(id, {
     env_file: "build/.env",
+    restart: 'on-failure',
     build: {
       context: ".",
       dockerfile: `${p.name}/Dockerfile`
@@ -140,6 +152,11 @@ const ServiceImpl = implement(res.Service, (p): { exposedUrl: string, version: s
       DB_NAME: "postgres",
       DB_USER: "user",
       DB_PASS: "password",
+
+      SMTP_HOST: "mailcatcher",
+      SMTP_PORT: "1025",
+      SMTP_PASS: "",
+      SMTP_USER: "",
 
       QUEUE_BACKEND: "redis",
       QUEUE_HOST: "redis",

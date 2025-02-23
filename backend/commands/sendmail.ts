@@ -3,15 +3,6 @@ import { getEnv } from 'common/utils';
 import nodemailer from 'nodemailer';
 
 export const sendmail = async (email: string, attachment: string, subject: string) => {
-  // const transporter = nodemailer.createTransport({
-  //   host: "poczta1.mat.umk.pl",
-  //   port: 587,
-  //   auth: {
-  //     user: "lasek",
-  //     pass: process.env.SMTP_PASS,
-  //   },
-  // });
-
   const transporter = nodemailer.createTransport({
     host: getEnv("SMTP_HOST"),
     port: parseInt(getEnv("SMTP_PORT")),

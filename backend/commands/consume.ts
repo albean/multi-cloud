@@ -21,7 +21,7 @@ export const consumeMail = () => ctx.mailQueue.consume(async msg => {
 
   await sendmail(
     msg.mail,
-    pdf,
+    "lol",
     `Bilet na wydarzenie "${event.name}"`
   );
 })

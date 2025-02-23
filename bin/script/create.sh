@@ -16,7 +16,7 @@ create_lock() {
 }
 
 release_lock() {
-  rm "$lock_file"
+  rm -f "$lock_file"
 }
 
 update_compose() {
