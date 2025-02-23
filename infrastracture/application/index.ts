@@ -53,9 +53,6 @@ export const Application = () => {
     name: "frontend",
     repo: frontendRepoPath,
     expose: true,
-    env: [
-      { name: "SERVER_URL", value: service.exposedUrl }
-    ]
   });
 
   Pipeline({
@@ -63,6 +60,7 @@ export const Application = () => {
     repo: frontendRepoPath,
     dockerfile: "frontend/Dockerfile",
     services: [frontend],
+    args: { SERVER_URL: service.exposedUrl }
   })
 
 
