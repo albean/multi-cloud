@@ -15,7 +15,7 @@ COPY postcss.config.js /app
 
 RUN ls -la;
 
-ARG BACKEND_PREFIX="https://undefined"
+ARG BACKEND_PREFIX
 ENV BACKEND_PREFIX=$BACKEND_PREFIX
 
 RUN bash -c 'echo $BACKEND_PREFIX';

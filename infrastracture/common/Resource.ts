@@ -25,6 +25,7 @@ export const Resource = <P, A = {}>() =>
         resource[k] = (...args: any) => extension[k](resource as any, ...args) as any
       });
 
+
       Object.assign(resource, attr);
 
       return resource as any;

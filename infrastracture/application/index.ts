@@ -6,6 +6,7 @@ import {
   DockerRepository,
   PersistantStorage,
   DockerRepositoryPath,
+  Image,
 } from "infrastracture/resources";
 
 export const Application = () => {
@@ -15,6 +16,8 @@ export const Application = () => {
   const backendRepoPath: DockerRepositoryPath = { repo, path: "backend" };
   const frontendRepoPath: DockerRepositoryPath = { repo, path: "frontend" };
   const backendServices: Service[] = [];
+
+  const backendImage = Image({ repo: backendRepoPath, dir: "backend" })
 
   const storage = PersistantStorage({ name: "attachments" });
 
@@ -30,7 +33,7 @@ export const Application = () => {
 
     const consumer = Service({
       name: `backend-consume-${name}`,
-      repo: backendRepoPath,
+      image: backendImage,
       secrets,
       command: ["consume", name],
       expose: false,
@@ -54,7 +57,7 @@ export const Application = () => {
 
   const service = Service({
     name: "backend-server",
-    repo: backendRepoPath,
+    image: backendImage,
     secrets,
     env: queuesEnv,
     command: ["server"],
@@ -73,9 +76,13 @@ export const Application = () => {
     services: backendServices,
   })
 
+  const frontendImage = Image({ repo: frontendRepoPath, dir: "frontend", args: {
+    BACKEND_PREFIX: service.exposedUrl,
+  }})
+
   const frontend = Service({
     name: "frontend",
-    repo: frontendRepoPath,
+    image: frontendImage,
     expose: true,
   });
 

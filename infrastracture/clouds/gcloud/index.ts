@@ -28,11 +28,21 @@ import { LocalBackend } from 'cdktf';
 import { scope, app } from "infrastracture/clouds/gcloud/scope";
 import { Application } from "infrastracture/application";
 import { singletone } from "common/utils";
+import moment from "moment";
+import { execSync } from 'child_process';
+
+const commit: string = execSync('git rev-parse HEAD').toString().trim();
 
 type Constructor<T, Args extends any[]> = new (scope: any, ...args: Args) => T;
 
 const tfResourceToFunc = <T, Args extends any[]>(Klass: Constructor<T, Args>): ((...args: Args) => T) =>
   (...args: Args) => new Klass(scope, ...args);
+
+new ShellProvider(scope, "shell-provider", {
+  enableParallelism: true,
+});
+
+
 
 const location = "europe-west1";
 const project = "ultimate-life-396919";
@@ -215,8 +225,6 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
 
   const command = p.command ? ["bash", "/app/entry", ...p.command] : undefined;
 
-  const image = p.command ? `${$gcloud(p.repo.repo).url}${p.repo.path}:250224-a826ac464f`
-    : `us-docker.pkg.dev/cloudrun/container/hello`;
 
   const service = gcloud.CloudRun(name, {
     name: `app-${p.name}`,
@@ -226,18 +234,18 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
     template: {
       scaling: { maxInstanceCount: 1, minInstanceCount: 0 },
       containers: [{
-        image,
+        image: $gcloud(p.image).tag,
         command: command,
         resources: { limits: {
           cpu: '1000m',
           memory,
         } },
         volumeMounts: [
-          { name: "cloudsql", mountPath: '/cloudsql' },
           ...(p.mounts??[]).map(v => {
             const storage = $gcloud(v.storage);
             return { name: storage.id, mountPath: v.path };
-          })
+          }),
+          { name: "cloudsql", mountPath: '/cloudsql' },
         ],
         env: [
           { name: "VER", value: "v23" },
@@ -253,11 +261,11 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
         ],
       }],
       volumes: [
-        { name: "cloudsql", cloudSqlInstance: { instances: [ instance.connectionName ] } },
         ...(p.mounts??[]).map(v => {
           const storage = $gcloud(v.storage);
           return { name: storage.id, gcs: { bucket: storage.name } }
-        })
+        }),
+        { name: "cloudsql", cloudSqlInstance: { instances: [ instance.connectionName ] } },
       ]
     }
   });
@@ -309,13 +317,36 @@ const DockerRepositoryImplementation = implement(res.DockerRepository, (p): { ur
 })
 
 const StorageBucket = implement(res.PersistantStorage, (p): { id: string, name: string } => {
-
   const storage = gcloud.StorageBucket(p.name, {
     name: `multi-cloud-${p.name}-n2lj3`,
     location,
   });
 
   return { id: p.name, name: storage.name };
+})
+
+const Image = implement(res.Image, (p): { tag: string } => {
+  const imageTag = `${$gcloud(p.repo.repo).url}${p.repo.path}`;
+
+  const args = p.args ?
+    Object.entries(p.args).map(([k,v]) => `--build-arg "${k}=${v}"`).join(" ")
+  : "";
+
+  const image = new Script(scope, "build_" + p.dir, {
+    lifecycleCommands: {
+      create: `${process.cwd()}/bin/script/build.sh`,
+      delete: `${process.cwd()}/bin/script/nop.sh`,
+    },
+    environment: {
+      _VERSION: commit,
+      CWD: process.cwd(),
+      DIR: p.dir,
+      REPO_URL: imageTag,
+      ARGS: args
+    }
+  });
+
+  return { tag: `\${${image.fqn}.output.tag}` };
 })
 
 export const $gcloud = digest({
@@ -326,6 +357,7 @@ export const $gcloud = digest({
   [ServiceType]: ServiceImplementation,
   [res.PersistantStorageType]: StorageBucket,
   [res.DockerRepositoryType]: DockerRepositoryImplementation,
+  [res.ImageType]: Image,
 })
 
 Application()

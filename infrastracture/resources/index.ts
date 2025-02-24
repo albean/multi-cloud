@@ -19,7 +19,7 @@ export type SecretKey = Resource<typeof SecretKeyType, {}>
 
 export const ServiceType = Symbol("ServiceType");
 export const Service = Resource<{
-  repo: DockerRepositoryPath;
+  image: Image,
   name: string;
   command?: string[];
   secrets?: { name: string, secret: SecretKey }[];
@@ -62,6 +62,10 @@ export type Pipeline = Resource<typeof PipelineType, {}>
 export const PersistantStorageType = Symbol("PersistantStorageType");
 export const PersistantStorage = Resource<{ name: string }>()(PersistantStorageType, {});
 export type PersistantStorage = Resource<typeof PersistantStorageType, {}>
+
+export const ImageType = Symbol("ImageType");
+export const Image = Resource<{ repo: DockerRepositoryPath, dir: string, args?: Record<string, string> }>()(ImageType, {});
+export type Image = Resource<typeof ImageType, {}>
 
 export interface DockerRepositoryPath {
   repo: DockerRepository,

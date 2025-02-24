@@ -27,7 +27,7 @@ new LocalBackend(scope, {
 });
 
 const resource = <T>(id: string, command: string, env: Record<string, string>) => {
-  return new Script(scope, id, {
+  const constr = new Script(scope, id, {
     lifecycleCommands: {
       create: `${process.cwd()}/bin/script/create.sh`,
       delete: `${process.cwd()}/bin/script/delete.sh`,
@@ -39,6 +39,9 @@ const resource = <T>(id: string, command: string, env: Record<string, string>) =
       ...env,
     }
   });
+
+  constr.addOverride('custom_field', false);
+  return constr;
 }
 
 interface ComposeService {
@@ -165,7 +168,7 @@ implement(res.Pipeline, (p): {} => {
 })
 
 const PersistantStorageImpl = implement(res.PersistantStorage, (p): { name: string } => {
-  const name = `${p.name}_v1`
+  const name = `${p.name}_v3`
   patch(`volumes.${name}`, {});
 
   return { name: name };
