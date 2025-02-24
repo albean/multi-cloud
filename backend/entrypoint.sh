@@ -1,10 +1,3 @@
-echo "BILLY envs"
-
-pwd
-echo "------------------------------------"
-env
-echo "------------------------------------"
-
 export DATABASE_URL="postgresql://${DB_USER}:${DB_PASS}@${DB_HOST}/${DB_NAME}"
 
 migrate() {
@@ -12,9 +5,13 @@ migrate() {
 }
 
 server() {
-  migrate &
-  command fixtures &
+  migrations &
   node dist/entry.js server
+}
+
+migrations() {
+  migrate
+  command fixtures&
 }
 
 command() {
