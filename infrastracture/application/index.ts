@@ -39,7 +39,7 @@ export const Application = () => {
       mounts: [{ storage, path: "/var/attachments" }]
     });
 
-    consumer.consume(mailQueue)
+    consumer.consume(queue)
     backendServices.push(consumer);
 
     return consumer;
