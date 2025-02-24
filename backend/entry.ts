@@ -19,7 +19,12 @@ const commands = {
 EnvBasedQueueFactorySetup()
 ContextSetup()
 
-const arg = process.argv.pop() as any;
+const args = [...process.argv];
+args.shift(); // node
+args.shift(); // script name
+const arg = args.shift()!;
 
-commands[arg]();
+console.log({ args, arg, argv: process.argv })
+
+commands[arg](args[0]);
 

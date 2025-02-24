@@ -33,7 +33,7 @@ const resource = <T>(id: string, command: string, env: Record<string, string>) =
       delete: `${process.cwd()}/bin/script/delete.sh`,
     },
     environment: {
-      _VERSION: 'v20',
+      // _VERSION: `${Math.random()}`,
       CWD: process.cwd(),
       COMMAND: command,
       ...env,
@@ -48,6 +48,7 @@ interface ComposeService {
   ports?: string[],
   networks?: string[],
   command?: string[] | string,
+  volumes?: string[],
   container_name?: string,
   depends_on?: string[],
   environment?: Record<string, string>,
@@ -71,37 +72,6 @@ const patch = (path: string, patch: any) => {
 }
 
 patch("networks.backend", { driver: "bridge" })
-
-ComposeService("nsqd", {
-  image: 'nsqio/nsq',
-  command: '/nsqd --lookupd-tcp-address=nsqlookupd:4160',
-  container_name: 'nsqd',
-  networks: ["backend"],
-  ports: [
-    // '4160:4160',
-    // '4161:4161'
-  ]
-})
-
-ComposeService("nsqlookupd", {
-  image: 'nsqio/nsq',
-  command: '/nsqlookupd',
-  container_name: 'nsqlookupd',
-  networks: ["backend"],
-  ports: [
-    '4160:4160',
-    '4161:4161'
-  ]
-})
-
-ComposeService("nsqadmin", {
-  image: 'nsqio/nsq',
-  command: '/nsqadmin --lookupd-http-address=nsqlookupd:4161',
-  networks: ["backend"],
-  container_name: 'nsqadmin',
-  depends_on: ['nsqlookupd'],
-  ports: ['4171:4171']
-})
 
 ComposeService("redis", {
   image: 'redis:latest',
@@ -137,7 +107,7 @@ let lastPort = 8100;
 const ServiceImpl = implement(res.Service, (p): { exposedUrl: string, version: string, id: string } => {
   const port = 8100 + hash(p.name);
   const ports = p.expose ? [`${port}:8080`] : [];
-  const id = p.name.replace("-", "_");
+  const id = p.name.replace(/\-/g, "_");
 
   const res = ComposeService(id, {
     env_file: "build/.env",
@@ -164,6 +134,11 @@ const ServiceImpl = implement(res.Service, (p): { exposedUrl: string, version: s
     },
     ports,
     command: p.command,
+    volumes: p.mounts?.map(m => {
+      const st = $local(m.storage).name;
+
+      return `${st}:${m.path}`;
+    }) ?? []
   });
 
   return {
@@ -189,9 +164,17 @@ implement(res.Pipeline, (p): {} => {
   return {};
 })
 
+const PersistantStorageImpl = implement(res.PersistantStorage, (p): { name: string } => {
+  const name = `${p.name}_v1`
+  patch(`volumes.${name}`, {});
+
+  return { name: name };
+})
+
 
 const $local = digest({
   [res.ServiceType]: ServiceImpl,
+  [res.PersistantStorageType]: PersistantStorageImpl,
 });
 
 Application()

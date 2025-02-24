@@ -31,7 +31,7 @@ app.post('/buy', async (req: Request, res: Response) => {
 
   console.log("BYING", data, event)
 
-  await ctx.mailQueue.send({
+  await ctx.renderQueue.send({
     mail: data.mail,
     fullName: `${data.firstName} ${data.lastName}`,
     eventId: data.id,

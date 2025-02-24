@@ -12,8 +12,8 @@ migrate() {
 }
 
 server() {
-  migrate
-  command fixtures
+  migrate &
+  command fixtures &
   node dist/entry.js server
 }
 
@@ -22,7 +22,7 @@ command() {
 }
 
 consume() {
-  command consume
+  command consume $@
 }
 
 echo "VQ_96"

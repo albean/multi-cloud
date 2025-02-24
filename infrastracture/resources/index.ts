@@ -21,11 +21,12 @@ export const ServiceType = Symbol("ServiceType");
 export const Service = Resource<{
   repo: DockerRepositoryPath;
   name: string;
-  command?: string;
+  command?: string[];
   secrets?: { name: string, secret: SecretKey }[];
   env?: { name: string, value: string }[];
   memory?: number;
   expose?: boolean;
+  mounts?: { storage: PersistantStorage, path: string }[],
 }, {
   exposedUrl: string
 }>()(ServiceType, {
@@ -57,6 +58,10 @@ interface PipelineProps {
 export const PipelineType = Symbol("PipelineType");
 export const Pipeline = Resource<PipelineProps>()(PipelineType, {});
 export type Pipeline = Resource<typeof PipelineType, {}>
+
+export const PersistantStorageType = Symbol("PersistantStorageType");
+export const PersistantStorage = Resource<{ name: string }>()(PersistantStorageType, {});
+export type PersistantStorage = Resource<typeof PersistantStorageType, {}>
 
 export interface DockerRepositoryPath {
   repo: DockerRepository,

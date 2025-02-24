@@ -9,6 +9,7 @@ export const renderPdf = async (vars: any) => {
     args: [
       "--disable-setuid-sandbox",
       "--no-sandbox",
+      "--disable-web-security",
       "--single-process",
       "--no-zygote",
       "--disable-gpu",
@@ -32,7 +33,7 @@ export const renderPdf = async (vars: any) => {
   const dir = tmpdir();
 
   const htmlOut = `${dir}/${randomBytes(8).toString('hex')}.html`;
-  const pdfOut = `${dir}/${randomBytes(8).toString('hex')}.pdf`;
+  const pdfOut = `/var/attachments/${randomBytes(8).toString('hex')}.pdf`;
 
   await copyFile(
     `${process.cwd()}/backend/assets/qr.svg`,

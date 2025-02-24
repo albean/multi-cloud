@@ -212,7 +212,7 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
   const name = `svc-${p.name}`;
   const memory = `${p.memory ?? 1}Gi`;
 
-  const command = p.command ? ["bash", "/app/entry", p.command] : undefined;
+  const command = p.command ? ["bash", "/app/entry", ...p.command] : undefined;
 
   const image = p.command ? `${$gcloud(p.repo.repo).url}${p.repo.path}:250222-8dccdb1918`
     : `us-docker.pkg.dev/cloudrun/container/hello`;

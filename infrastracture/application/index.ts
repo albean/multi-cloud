@@ -4,6 +4,7 @@ import {
   Secret,
   Service,
   DockerRepository,
+  PersistantStorage,
   DockerRepositoryPath,
 } from "infrastracture/resources";
 
@@ -13,8 +14,28 @@ export const Application = () => {
   const repo = DockerRepository({ name: "app" })
   const backendRepoPath: DockerRepositoryPath = { repo, path: "backend" };
   const frontendRepoPath: DockerRepositoryPath = { repo, path: "frontend" };
+  const backendServices: Service[] = [];
 
-  const mailQueue = Queue({ name: "mail" })
+  const storage = PersistantStorage({ name: "attachments" });
+
+  const queueConsumer = (name: string, memory = 1) => {
+    const mailQueue = Queue({ name })
+
+    const consumer = Service({
+      name: `backend-consume-${name}`,
+      repo: backendRepoPath,
+      secrets,
+      command: ["consume", name],
+      expose: false,
+      memory,
+      mounts: [{ storage, path: "/var/attachments" }]
+    });
+
+    consumer.consume(mailQueue)
+    backendServices.push(consumer);
+
+    return consumer;
+  }
 
   const secrets = [
     { name: "SMTP_HOST", secret: secret.key("host") },
@@ -27,26 +48,20 @@ export const Application = () => {
     name: "backend-server",
     repo: backendRepoPath,
     secrets,
-    command: "server",
+    command: ["server"],
     expose: true,
   });
 
-  const consumer = Service({
-    name: "backend-consume",
-    repo: backendRepoPath,
-    secrets,
-    command: "consume",
-    expose: false,
-    memory: 4,
-  });
+  backendServices.push(service)
 
-  consumer.consume(mailQueue)
+  queueConsumer("mail");
+  queueConsumer("render", 4);
 
   const pipeline = Pipeline({
     name: "backend",
     repo: backendRepoPath,
     dockerfile: "backend/Dockerfile",
-    services: [service, consumer],
+    services: backendServices,
   })
 
   const frontend = Service({
@@ -62,9 +77,6 @@ export const Application = () => {
     services: [frontend],
     args: { BACKEND_PREFIX: service.exposedUrl }
   })
-
-
-  // Backend(props.domain)
 }
 
 // const Backend = (domain: string) => {

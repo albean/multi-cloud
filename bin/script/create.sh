@@ -4,11 +4,18 @@ CONTAINER_ID=$(docker run -d nginx)
 
 lock_file="/tmp/__app_lock"
 
+log() {
+  echo "$@" >> /tmp/log
+}
+
 wait_lock() {
-  [ -e "$lock_file" ] && (echo "Waiting for the lock to be released..." >> /tmp/log; sleep 0.01; wait_lock)
+  log "Waiting for log"
+
+  [ -e "$lock_file" ] && (echo "Waiting for the lock to be released..." >> /tmp/log; sleep 1; wait_lock)
 }
 
 create_lock() {
+  log "Create lock"
   wait_lock
   rand_str=$(uuidgen)
   echo "$rand_str" > "$lock_file"
@@ -42,6 +49,9 @@ update_compose() {
   local out=$(jq -s "$JCMD" build/docker-compose.yml $PATCHPATH)
 
   echo $out > build/docker-compose.yml
+  echo "PATH: $JPATH" > /tmp/log
+  echo "OUTPUT" > /tmp/log
+  echo $out > /tmp/log
 
   printf '{"success": true, "version": "%s"}\n' "$(date +%Y-%m-%d\ %H:%M)"
 
