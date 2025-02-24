@@ -34,6 +34,7 @@ export const consumeRender = () => ctx.renderQueue.consume(async msg => {
     topic: `Bilet na wydarzenie "${event.name}"`,
   })
 
+  console.log("Enqueued mail send")
 })
 
 
