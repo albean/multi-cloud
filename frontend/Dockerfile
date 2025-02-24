@@ -13,14 +13,14 @@ COPY vite.config.ts /app
 COPY tailwind.config.js /app
 COPY postcss.config.js /app
 
-RUN ls -la
+RUN ls -la;
 
 ARG BACKEND_PREFIX="https://undefined"
 ENV BACKEND_PREFIX=$BACKEND_PREFIX
 
+RUN bash -c 'echo $BACKEND_PREFIX';
 RUN npx vite build;
 
-RUN ls -la frontend/dist;
 RUN ls -la frontend/dist;
 
 FROM nginx
