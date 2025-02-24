@@ -116,10 +116,10 @@ const pubSubSa = singletone(() => {
   return sa;
 });
 
-const QueueImpementation = implement(Queue, (props): { topic: gcloud.PubsubTopic } => {
+const QueueImpementation = implement(Queue, (props): { topic: gcloud.PubsubTopic, id: string } => {
   const topic = gcloud.PubsubTopic(props.name, { name: `dev-${props.name}-topic`})
 
-  return { topic };
+  return { topic, id: topic.name };
 })
 
 const SecretImplementation = implement(Secret, (p): { prefix: string } => {
@@ -237,7 +237,6 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
           { name: "VER", value: "v23" },
 
           { name: "QUEUE_BACKEND", value: "pubsub" },
-          { name: "QUEUE_MAIL_ID", value: "dev-mail-topic" },
 
           { name: "DB_HOST", value: instance.ipAddress.get(0).getStringAttribute("ip_address") },
           { name: "DB_NAME", value: "prod" },

@@ -1,7 +1,7 @@
 import { Resource } from "../common/Resource";
 
 export const QueueType = Symbol("QueueType");
-export const Queue = Resource<{ name: string }>()(QueueType, {});
+export const Queue = Resource<{ name: string }, { id: string }>()(QueueType, {});
 export type Queue = Resource<typeof QueueType, {}>
 
 export const SecretType = Symbol("SecretType");

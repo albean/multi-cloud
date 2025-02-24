@@ -18,8 +18,15 @@ export const Application = () => {
 
   const storage = PersistantStorage({ name: "attachments" });
 
-  const queueConsumer = (name: string, memory = 1) => {
-    const mailQueue = Queue({ name })
+  const mailQueue = Queue({ name: "email" })
+  const renderQueue = Queue({ name: "render" })
+
+  const queuesEnv = [
+    { name: "QUEUE_MAIL_ID", value: mailQueue.id },
+    { name: "QUEUE_RENDER_ID", value: renderQueue.id },
+  ];
+
+  const queueConsumer = (name: string, queue: Queue, memory = 1) => {
 
     const consumer = Service({
       name: `backend-consume-${name}`,
@@ -27,6 +34,7 @@ export const Application = () => {
       secrets,
       command: ["consume", name],
       expose: false,
+      env: queuesEnv,
       memory,
       mounts: [{ storage, path: "/var/attachments" }]
     });
@@ -48,14 +56,15 @@ export const Application = () => {
     name: "backend-server",
     repo: backendRepoPath,
     secrets,
+    env: queuesEnv,
     command: ["server"],
     expose: true,
   });
 
   backendServices.push(service)
 
-  queueConsumer("mail");
-  queueConsumer("render", 4);
+  queueConsumer("mail", mailQueue);
+  queueConsumer("render", renderQueue, 4);
 
   const pipeline = Pipeline({
     name: "backend",
