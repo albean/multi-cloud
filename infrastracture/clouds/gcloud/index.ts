@@ -148,7 +148,6 @@ const PipelineImplementation = implement(Pipeline, (p): {  } => {
     Object.entries(p.args).map(([k,v]) => `--build-arg "${k}=$_ARG_${k}"`).join(" ")
   : "";
 
-
   gcloud.CloudBuildTrigger(`pipeline-${p.name}`, {
     name: p.name,
     location,
@@ -162,6 +161,8 @@ const PipelineImplementation = implement(Pipeline, (p): {  } => {
           name: "gcr.io/cloud-builders/docker",
           script: [
             `set -e`,
+            `echo 'docker build --platform linux/amd64 --progress plain -t image -f ${p.dockerfile} ${args} .'`,
+            `echo "docker build --platform linux/amd64 --progress plain -t image -f ${p.dockerfile} ${args} ."`,
             `docker build --platform linux/amd64 --progress plain -t image -f ${p.dockerfile} ${args} .`,
             "echo 'Building...'",
             `export TAG="$(date +%y%m%d)-$(openssl rand -hex 16 | head -c 10)"`,
