@@ -30,6 +30,7 @@ export const SqlDatabase = tfResourceToFunc(gcloud.sqlDatabase.SqlDatabase);
 export const SqlDatabaseInstance = tfResourceToFunc(gcloud.sqlDatabaseInstance.SqlDatabaseInstance);
 export const SqlUser = tfResourceToFunc(gcloud.sqlUser.SqlUser);
 export const SecretManagerSecret = tfResourceToFunc(gcloud.secretManagerSecret.SecretManagerSecret);
+export const StorageBucket = tfResourceToFunc(gcloud.storageBucket.StorageBucket);
 
 export const PubsubTopic = tfResourceToFunc(gcloud.pubsubTopic.PubsubTopic);
 export type PubsubTopic = gcloud.pubsubTopic.PubsubTopic;

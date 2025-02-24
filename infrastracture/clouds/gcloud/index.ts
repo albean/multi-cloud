@@ -232,7 +232,13 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
           cpu: '1000m',
           memory,
         } },
-        volumeMounts: [{ name: "cloudsql", mountPath: '/cloudsql' }],
+        volumeMounts: [
+          { name: "cloudsql", mountPath: '/cloudsql' },
+          ...(p.mounts??[]).map(v => {
+            const storage = $gcloud(v.storage);
+            return { name: storage.id, mountPath: v.path };
+          })
+        ],
         env: [
           { name: "VER", value: "v23" },
 
@@ -246,12 +252,13 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
           ...(p.env ?? []),
         ],
       }],
-      volumes: [{
-        name: "cloudsql",
-        cloudSqlInstance: {
-          instances: [instance.connectionName],
-        }
-      }]
+      volumes: [
+        { name: "cloudsql", cloudSqlInstance: { instances: [ instance.connectionName ] } },
+        ...(p.mounts??[]).map(v => {
+          const storage = $gcloud(v.storage);
+          return { name: storage.id, gcs: { bucket: storage.name } }
+        })
+      ]
     }
   });
 
@@ -301,12 +308,23 @@ const DockerRepositoryImplementation = implement(res.DockerRepository, (p): { ur
   };
 })
 
+const StorageBucket = implement(res.PersistantStorage, (p): { id: string, name: string } => {
+
+  const storage = gcloud.StorageBucket(p.name, {
+    name: `multi-cloud-${p.name}-n2lj3`,
+    location,
+  });
+
+  return { id: p.name, name: storage.name };
+})
+
 export const $gcloud = digest({
   [QueueType]: QueueImpementation,
   [SecretType]: SecretImplementation,
   [SecretKeyType]: SecretKeyImplementation,
   [PipelineType]: PipelineImplementation,
   [ServiceType]: ServiceImplementation,
+  [res.PersistantStorageType]: StorageBucket,
   [res.DockerRepositoryType]: DockerRepositoryImplementation,
 })
 

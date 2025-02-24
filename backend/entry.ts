@@ -24,7 +24,5 @@ args.shift(); // node
 args.shift(); // script name
 const arg = args.shift()!;
 
-console.log({ args, arg, argv: process.argv })
-
 commands[arg](args[0]);
 
