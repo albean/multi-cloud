@@ -2,7 +2,7 @@
 .venv
 node_modules
 cdktf.out/
-/dist
 /build
+/dist
 cdktf.prod.out
 cdktf.dev.out

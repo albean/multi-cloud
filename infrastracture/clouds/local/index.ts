@@ -19,11 +19,9 @@ const hash = (input: string): number => {
   return intHash % 101;
 };
 
-const yamlResources: ITerraformDependable[] = []
+const yamlResources: Script[] = []
 
-new ShellProvider(scope, "shell-provider", {
-  enableParallelism: true,
-});
+new ShellProvider(scope, "shell-provider", { enableParallelism: true });
 
 new LocalBackend(scope, {
   path: 'cdktf.out/state/terraform.tfstate'
@@ -36,7 +34,7 @@ const resource = <T>(id: string, command: string, env: Record<string, string>) =
       delete: `${process.cwd()}/bin/script/delete.sh`,
     },
     environment: {
-      // _VERSION: `${Math.random()}`,
+      _VERSION: `v1`,
       CWD: process.cwd(),
       COMMAND: command,
       ...env,
@@ -72,11 +70,16 @@ const ComposeService = (id: string, service: ComposeService) => {
 }
 
 const patch = (path: string, patch: any) => {
-  return resource(`patch-${path.replace(/[^a-z0-9]+/g, "-")}`, "update_compose", {
+  const res = resource(`patch-${path.replace(/[^a-z0-9]+/g, "-")}`, "update_compose", {
     PATCH: JSON.stringify(patch),
     JPATH: path,
   });
+
+  yamlResources.push(res)
+
+  return res;
 }
+
 
 patch("networks.backend", { driver: "bridge" })
 
@@ -195,7 +198,7 @@ setTimeout(() => {
     environment: {
       CWD: process.cwd(),
       COMMAND: "dc_up",
-      VERSION: "v1",
+      VERSION: yamlResources.map(_ => _.output.lookup("version")).join(","),
     }
   });
   app.synth();
