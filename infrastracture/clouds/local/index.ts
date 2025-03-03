@@ -4,10 +4,11 @@ import { digest, implement } from "infrastracture/common/Resource";
 import { ShellProvider } from ".gen/providers/shell/provider";
 import { Script } from ".gen/providers/shell/script";
 import * as res from "infrastracture/resources";
-import { App, TerraformStack } from "cdktf";
+import { App, ITerraformDependable, TerraformStack } from "cdktf";
 import { LocalBackend } from 'cdktf';
 import { Application } from "infrastracture/application";
 import * as crypto from 'crypto';
+import { Construct } from "constructs";
 
 const app = new App();
 const scope = new TerraformStack(app, "app");
@@ -17,6 +18,8 @@ const hash = (input: string): number => {
   const intHash = parseInt(hash.slice(0, 8), 16);
   return intHash % 101;
 };
+
+const yamlResources: ITerraformDependable[] = []
 
 new ShellProvider(scope, "shell-provider", {
   enableParallelism: true,
@@ -40,7 +43,6 @@ const resource = <T>(id: string, command: string, env: Record<string, string>) =
     }
   });
 
-  constr.addOverride('custom_field', false);
   return constr;
 }
 
@@ -63,6 +65,8 @@ const ComposeService = (id: string, service: ComposeService) => {
     PATCH: JSON.stringify(service),
     JPATH: `services.${id}`,
   });
+
+  yamlResources.push(res);
 
   return { version: `\${${res.fqn}.output.version}` };
 }
@@ -174,7 +178,6 @@ const PersistantStorageImpl = implement(res.PersistantStorage, (p): { name: stri
   return { name: name };
 })
 
-
 const $local = digest({
   [res.ServiceType]: ServiceImpl,
   [res.PersistantStorageType]: PersistantStorageImpl,
@@ -182,4 +185,18 @@ const $local = digest({
 
 Application()
 
-setTimeout(() => app.synth())
+setTimeout(() => {
+  new Script(scope, "compose-up", {
+    dependsOn: yamlResources,
+    lifecycleCommands: {
+      create: `${process.cwd()}/bin/script/create.sh`,
+      delete: `${process.cwd()}/bin/script/delete.sh`,
+    },
+    environment: {
+      CWD: process.cwd(),
+      COMMAND: "dc_up",
+      VERSION: "v1",
+    }
+  });
+  app.synth();
+})

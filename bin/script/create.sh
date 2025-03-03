@@ -11,7 +11,7 @@ log() {
 wait_lock() {
   log "Waiting for log"
 
-  [ -e "$lock_file" ] && (echo "Waiting for the lock to be released..." >> /tmp/log; sleep 1; wait_lock)
+  [ -e "$lock_file" ] && (echo "Waiting for the lock to be released..." >> /tmp/log_mc; sleep 1; wait_lock)
 }
 
 create_lock() {
@@ -27,14 +27,14 @@ release_lock() {
 }
 
 update_compose() {
-  echo "JSONNNET" >> /tmp/log
+  echo "JSONNNET" >> /tmp/log_mc
   PATCHPATH="$(mktemp)"
   echo "$PATCH" > $PATCHPATH
-  cat $PATCHPATH >> /tmp/log
+  cat $PATCHPATH >> /tmp/log_mc
   # JCMD=".[0]"
   JCMD="del(.[0].$JPATH) | .[0].$JPATH = .[1] | .[0]"
 
-  echo $JCMD >> /tmp/log
+  echo $JCMD >> /tmp/log_mc
 
   create_lock
 
@@ -44,28 +44,29 @@ update_compose() {
     echo '{ "services": {} }' > build/docker-compose.yml
   fi
 
-  cat build/docker-compose.yml >> /tmp/log
+  cat build/docker-compose.yml >> /tmp/log_mc
 
   local out=$(jq -s "$JCMD" build/docker-compose.yml $PATCHPATH)
 
   echo $out > build/docker-compose.yml
-  echo "PATH: $JPATH" > /tmp/log
-  echo "OUTPUT" > /tmp/log
-  echo $out > /tmp/log
-
-  printf '{"success": true, "version": "%s"}\n' "$(date +%Y-%m-%d\ %H:%M)"
+  echo "PATH: $JPATH" > /tmp/log_mc
+  echo "OUTPUT" > /tmp/log_mc
+  echo $out > /tmp/log_mc
 
   release_lock
 }
 
-cup() {
-  docker-compose -p mulit_app -f build/docker-compose.yml up -d --build
+dc_up() {
+  docker compose -p mulit_app -f build/docker-compose.yml --project-directory $(pwd) up -d --build
+
 }
 
 cd $CWD
-echo "creating..." >> /tmp/log
-pwd >> /tmp/log
-echo $@ >> /tmp/log
-echo $COMMANND >> /tmp/log
+echo "creating..." >> /tmp/log_mc
+pwd >> /tmp/log_mc
+echo $@ >> /tmp/log_mc
+echo $COMMANND >> /tmp/log_mc
 
 $COMMAND
+
+printf '{"success": true, "version": "%s"}\n' "$(date +%Y-%m-%d\ %H:%M)"

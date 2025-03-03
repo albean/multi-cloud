@@ -3,5 +3,6 @@
 node_modules
 cdktf.out/
 /dist
+/build
 cdktf.prod.out
 cdktf.dev.out
