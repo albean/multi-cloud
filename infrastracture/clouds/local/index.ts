@@ -120,7 +120,7 @@ const ServiceImpl = implement(res.Service, (p): { exposedUrl: string, version: s
   const id = p.name.replace(/\-/g, "_");
 
   const res = ComposeService(id, {
-    env_file: "build/.env",
+    // env_file: "build/.env",
     restart: 'on-failure',
     build: {
       context: ".",
@@ -140,7 +140,7 @@ const ServiceImpl = implement(res.Service, (p): { exposedUrl: string, version: s
 
       QUEUE_BACKEND: "redis",
       QUEUE_HOST: "redis",
-      // QUEUE_MAIL_ID: "dev-mail-topic",
+      QUEUE_MAIL_ID: "dev-mail-topic",
     },
     ports,
     command: p.command,
@@ -198,6 +198,7 @@ setTimeout(() => {
     environment: {
       CWD: process.cwd(),
       COMMAND: "dc_up",
+      // VER: `${Math.random()}`,
       VERSION: yamlResources.map(_ => _.output.lookup("version")).join(","),
     }
   });

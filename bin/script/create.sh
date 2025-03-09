@@ -5,7 +5,7 @@ CONTAINER_ID=$(docker run -d nginx)
 lock_file="/tmp/__app_lock"
 
 log() {
-  echo "$@" >> /tmp/log
+  echo "$@" >> /tmp/log_mc
 }
 
 wait_lock() {
@@ -57,8 +57,9 @@ update_compose() {
 }
 
 dc_up() {
+  echo "dc_up...." >> /tmp/log_mc
   docker compose -p mulit_app -f build/docker-compose.yml --project-directory $(pwd) up -d --build
-
+  echo "DONE" >> /tmp/log_mc
 }
 
 cd $CWD
