@@ -6,3 +6,5 @@ cdktf.out/
 /dist
 cdktf.prod.out
 cdktf.dev.out
+/public
+!.gitkeep
