@@ -804,7 +804,7 @@
           "CWD": "/Users/billy/p/multi-cloud",
           "DIR": "backend",
           "REPO_URL": "${google_artifact_registry_repository.repository-app.location}-docker.pkg.dev/ultimate-life-396919/${google_artifact_registry_repository.repository-app.name}/backend",
-          "_VERSION": "fa2e3dd735f794100b5e55ce84c19eff9a2b6242"
+          "_VERSION": "3d96135c9a1cf2492741297cb2698f9b2b444e36"
         },
         "lifecycle_commands": {
           "create": "/Users/billy/p/multi-cloud/bin/script/build.sh",
@@ -823,7 +823,7 @@
           "CWD": "/Users/billy/p/multi-cloud",
           "DIR": "frontend",
           "REPO_URL": "${google_artifact_registry_repository.repository-app.location}-docker.pkg.dev/ultimate-life-396919/${google_artifact_registry_repository.repository-app.name}/frontend",
-          "_VERSION": "fa2e3dd735f794100b5e55ce84c19eff9a2b6242"
+          "_VERSION": "3d96135c9a1cf2492741297cb2698f9b2b444e36"
         },
         "lifecycle_commands": {
           "create": "/Users/billy/p/multi-cloud/bin/script/build.sh",
