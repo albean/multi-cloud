@@ -8,3 +8,4 @@ cdktf.prod.out
 cdktf.dev.out
 /public
 !.gitkeep
+!cdktf.prod.out/stacks/app/cdk.tf.json
