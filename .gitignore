@@ -4,7 +4,6 @@ node_modules
 cdktf.out/
 /build
 /dist
-cdktf.prod.out
 cdktf.dev.out
 /public
 !.gitkeep
