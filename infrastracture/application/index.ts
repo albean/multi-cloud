@@ -13,8 +13,10 @@ export const Application = () => {
   const secret = Secret({ name: "smtp" })
 
   const repo = DockerRepository({ name: "app" })
+
   const backendRepoPath: DockerRepositoryPath = { repo, path: "backend" };
   const frontendRepoPath: DockerRepositoryPath = { repo, path: "frontend" };
+
   const backendServices: Service[] = [];
 
   const backendImage = Image({ repo: backendRepoPath, dir: "backend" })

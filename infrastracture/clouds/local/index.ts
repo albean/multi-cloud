@@ -198,7 +198,7 @@ setTimeout(() => {
     environment: {
       CWD: process.cwd(),
       COMMAND: "dc_up",
-      // VER: `${Math.random()}`,
+      VER: `${Math.random()}`,
       VERSION: yamlResources.map(_ => _.output.lookup("version")).join(","),
     }
   });
