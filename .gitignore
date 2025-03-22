@@ -5,6 +5,7 @@ cdktf.out/
 /build
 /dist
 cdktf.dev.out
+cdktf.prod.out
 /public
 !.gitkeep
 !cdktf.prod.out/stacks/app/cdk.tf.json
