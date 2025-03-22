@@ -9,7 +9,6 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use('/files', express.static('public'))
 
 app.get('/events', async (_req: Request, res: Response) => {
   const eventsRes = await db.select().from(events)
