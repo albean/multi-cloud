@@ -1,39 +1,28 @@
-import {
-  Pipeline,
-  Queue,
-  Secret,
-  Service,
-  DockerRepository,
-  PersistantStorage,
-  DockerRepositoryPath,
-  Image,
-} from "infrastracture/resources";
+import * as infra from "infrastracture/resources";
 
 export const Application = () => {
-  const secret = Secret({ name: "smtp" })
+  const secret = new infra.Secret({ name: "smtp" })
+  const repo = new infra.DockerRepository({ name: "app" })
 
-  const repo = DockerRepository({ name: "app" })
+  const backendRepoPath: infra.DockerRepositoryPath = { repo, path: "backend" };
+  const frontendRepoPath: infra.DockerRepositoryPath = { repo, path: "frontend" };
 
-  const backendRepoPath: DockerRepositoryPath = { repo, path: "backend" };
-  const frontendRepoPath: DockerRepositoryPath = { repo, path: "frontend" };
+  const backendServices: infra.Service[] = [];
 
-  const backendServices: Service[] = [];
+  const backendImage = new infra.Image({ repo: backendRepoPath, dir: "backend" })
 
-  const backendImage = Image({ repo: backendRepoPath, dir: "backend" })
+  const storage = new infra.PersistantStorage({ name: "attachments" });
 
-  const storage = PersistantStorage({ name: "attachments" });
-
-  const mailQueue = Queue({ name: "email" })
-  const renderQueue = Queue({ name: "render" })
+  const mailQueue = new infra.Queue({ name: "email" })
+  const renderQueue = new infra.Queue({ name: "render" })
 
   const queuesEnv = [
     { name: "QUEUE_MAIL_ID", value: mailQueue.id },
     { name: "QUEUE_RENDER_ID", value: renderQueue.id },
   ];
 
-  const queueConsumer = (name: string, queue: Queue, memory = 1) => {
-
-    const consumer = Service({
+  const queueConsumer = (name: string, queue: infra.Queue, memory = 1) => {
+    const consumer = new infra.Service({
       name: `backend-consume-${name}`,
       image: backendImage,
       secrets,
@@ -57,7 +46,7 @@ export const Application = () => {
     { name: "SMTP_PASS", secret: secret.key("pass") },
   ];
 
-  const service = Service({
+  const service = new infra.Service({
     name: "backend-server",
     image: backendImage,
     secrets,
@@ -71,40 +60,13 @@ export const Application = () => {
   queueConsumer("mail", mailQueue);
   queueConsumer("render", renderQueue, 4);
 
-  const pipeline = Pipeline({
-    name: "backend",
-    repo: backendRepoPath,
-    dockerfile: "backend/Dockerfile",
-    services: backendServices,
-  })
-
-  const frontendImage = Image({ repo: frontendRepoPath, dir: "frontend", args: {
+  const frontendImage = new infra.Image({ repo: frontendRepoPath, dir: "frontend", args: {
     BACKEND_PREFIX: service.exposedUrl,
   }})
 
-  const frontend = Service({
+  new infra.Service({
     name: "frontend",
     image: frontendImage,
     expose: true,
   });
-
-  Pipeline({
-    name: "frontend",
-    repo: frontendRepoPath,
-    dockerfile: "frontend/Dockerfile",
-    services: [frontend],
-    args: { BACKEND_PREFIX: service.exposedUrl }
-  })
 }
-
-// const Backend = (domain: string) => {
-//   const build = Build({ path: `backend` });
-//
-//   const container = Container({ build });
-//
-//   console.log({ container })
-//
-//   container.expose(`api.${domain}`);
-// };
-
-interface Props { domain: string }

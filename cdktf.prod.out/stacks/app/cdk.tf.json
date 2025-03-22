@@ -547,85 +547,6 @@
         }
       }
     },
-    "google_cloudbuild_trigger": {
-      "pipeline-backend": {
-        "//": {
-          "metadata": {
-            "path": "app/pipeline-backend",
-            "uniqueId": "pipeline-backend"
-          }
-        },
-        "build": {
-          "step": [
-            {
-              "env": [
-                "REPO=${google_artifact_registry_repository.repository-app.location}-docker.pkg.dev/ultimate-life-396919/${google_artifact_registry_repository.repository-app.name}/backend"
-              ],
-              "name": "gcr.io/cloud-builders/docker",
-              "script": "set -e;\necho 'docker build --platform linux/amd64 --progress plain -t image -f backend/Dockerfile  .';\necho \"docker build --platform linux/amd64 --progress plain -t image -f backend/Dockerfile  .\";\ndocker build --platform linux/amd64 --progress plain -t image -f backend/Dockerfile  .;\necho 'Building...';\nexport TAG=\"$(date +%y%m%d)-$(openssl rand -hex 16 | head -c 10)\";\necho $REPO:$TAG;\ndocker tag image $REPO:$TAG;\ndocker push $REPO:$TAG;\necho $REPO:$TAG > image.txt"
-            },
-            {
-              "name": "gcr.io/google.com/cloudsdktool/cloud-sdk",
-              "script": "set -e;\nexport IMAGE=$(cat image.txt);\necho \"Deploying location $IMAGE\";\necho \"------------\";\necho \"IMAGE: $IMAGE\";\necho \"gcloud run deploy ${google_cloud_run_v2_service.svc-backend-server.name} --image $IMAGE --region europe-west1\";\ngcloud run deploy ${google_cloud_run_v2_service.svc-backend-server.name} --image $IMAGE --region europe-west1;\necho \"------------\";\necho \"------------\";\necho \"IMAGE: $IMAGE\";\necho \"gcloud run deploy ${google_cloud_run_v2_service.svc-backend-consume-mail.name} --image $IMAGE --region europe-west1\";\ngcloud run deploy ${google_cloud_run_v2_service.svc-backend-consume-mail.name} --image $IMAGE --region europe-west1;\necho \"------------\";\necho \"------------\";\necho \"IMAGE: $IMAGE\";\necho \"gcloud run deploy ${google_cloud_run_v2_service.svc-backend-consume-render.name} --image $IMAGE --region europe-west1\";\ngcloud run deploy ${google_cloud_run_v2_service.svc-backend-consume-render.name} --image $IMAGE --region europe-west1;\necho \"------------\""
-            }
-          ]
-        },
-        "location": "europe-west1",
-        "name": "backend",
-        "repository_event_config": {
-          "push": {
-            "branch": "main"
-          },
-          "repository": "${google_cloudbuildv2_repository.repo.id}"
-        }
-      },
-      "pipeline-frontend": {
-        "//": {
-          "metadata": {
-            "path": "app/pipeline-frontend",
-            "uniqueId": "pipeline-frontend"
-          }
-        },
-        "build": {
-          "step": [
-            {
-              "env": [
-                "REPO=${google_artifact_registry_repository.repository-app.location}-docker.pkg.dev/ultimate-life-396919/${google_artifact_registry_repository.repository-app.name}/frontend",
-                "_ARG_BACKEND_PREFIX=${google_cloud_run_v2_service.svc-backend-server.uri}"
-              ],
-              "name": "gcr.io/cloud-builders/docker",
-              "script": "set -e;\necho 'docker build --platform linux/amd64 --progress plain -t image -f frontend/Dockerfile --build-arg \"BACKEND_PREFIX=$_ARG_BACKEND_PREFIX\" .';\necho \"docker build --platform linux/amd64 --progress plain -t image -f frontend/Dockerfile --build-arg \"BACKEND_PREFIX=$_ARG_BACKEND_PREFIX\" .\";\ndocker build --platform linux/amd64 --progress plain -t image -f frontend/Dockerfile --build-arg \"BACKEND_PREFIX=$_ARG_BACKEND_PREFIX\" .;\necho 'Building...';\nexport TAG=\"$(date +%y%m%d)-$(openssl rand -hex 16 | head -c 10)\";\necho $REPO:$TAG;\ndocker tag image $REPO:$TAG;\ndocker push $REPO:$TAG;\necho $REPO:$TAG > image.txt"
-            },
-            {
-              "name": "gcr.io/google.com/cloudsdktool/cloud-sdk",
-              "script": "set -e;\nexport IMAGE=$(cat image.txt);\necho \"Deploying location $IMAGE\";\necho \"------------\";\necho \"IMAGE: $IMAGE\";\necho \"gcloud run deploy ${google_cloud_run_v2_service.svc-frontend.name} --image $IMAGE --region europe-west1\";\ngcloud run deploy ${google_cloud_run_v2_service.svc-frontend.name} --image $IMAGE --region europe-west1;\necho \"------------\""
-            }
-          ]
-        },
-        "location": "europe-west1",
-        "name": "frontend",
-        "repository_event_config": {
-          "push": {
-            "branch": "main"
-          },
-          "repository": "${google_cloudbuildv2_repository.repo.id}"
-        }
-      }
-    },
-    "google_cloudbuildv2_repository": {
-      "repo": {
-        "//": {
-          "metadata": {
-            "path": "app/repo",
-            "uniqueId": "repo"
-          }
-        },
-        "location": "europe-west1",
-        "name": "mcloud",
-        "parent_connection": "projects/ultimate-life-396919/locations/europe-west1/connections/gh",
-        "remote_uri": "https://github.com/albean/multi-cloud.git"
-      }
-    },
     "google_project_iam_member": {
       "binding-registry": {
         "//": {
@@ -883,7 +804,7 @@
           "CWD": "/Users/billy/p/multi-cloud",
           "DIR": "backend",
           "REPO_URL": "${google_artifact_registry_repository.repository-app.location}-docker.pkg.dev/ultimate-life-396919/${google_artifact_registry_repository.repository-app.name}/backend",
-          "_VERSION": "f10f6b2f495078bcfb5a3b64ec3c37892f1db722"
+          "_VERSION": "3d96135c9a1cf2492741297cb2698f9b2b444e36"
         },
         "lifecycle_commands": {
           "create": "/Users/billy/p/multi-cloud/bin/script/build.sh",
@@ -902,7 +823,7 @@
           "CWD": "/Users/billy/p/multi-cloud",
           "DIR": "frontend",
           "REPO_URL": "${google_artifact_registry_repository.repository-app.location}-docker.pkg.dev/ultimate-life-396919/${google_artifact_registry_repository.repository-app.name}/frontend",
-          "_VERSION": "f10f6b2f495078bcfb5a3b64ec3c37892f1db722"
+          "_VERSION": "3d96135c9a1cf2492741297cb2698f9b2b444e36"
         },
         "lifecycle_commands": {
           "create": "/Users/billy/p/multi-cloud/bin/script/build.sh",

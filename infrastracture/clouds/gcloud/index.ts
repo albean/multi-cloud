@@ -1,57 +1,20 @@
-import { digest, implement } from "infrastracture/common/Resource";
-import {
-  Service,
-  Secret,
-  Queue,
-  QueueType,
-  SecretType,
-  SecretKeyType,
-  SecretKey,
-  QueueConsumer,
-  ServiceType,
-  Pipeline,
-  PipelineType,
-} from "infrastracture/resources";
-
-import * as res from "infrastracture/resources";
+import { implement } from "infrastracture/common/Resource";
+import * as infra from "infrastracture/resources";
 import { ShellProvider } from ".gen/providers/shell/provider";
 import { Script } from ".gen/providers/shell/script";
-import { App, TerraformStack } from "cdktf";
-import { GoogleProvider } from "@cdktf/provider-google/lib/provider";
-import { CloudRunV2Service } from "@cdktf/provider-google/lib/cloud-run-v2-service";
-import { CloudbuildTrigger } from "@cdktf/provider-google/lib/cloudbuild-trigger";
-import { Cloudbuildv2Repository } from "@cdktf/provider-google/lib/cloudbuildv2-repository";
 import * as gcloud from "./resources"
-import * as tf from "cdktf"
-import { CloudRunServiceIamBinding } from "@cdktf/provider-google/lib/cloud-run-service-iam-binding";
-import { LocalBackend } from 'cdktf';
 import { scope, app } from "infrastracture/clouds/gcloud/scope";
 import { Application } from "infrastracture/application";
 import { singletone } from "common/utils";
-import moment from "moment";
 import { execSync } from 'child_process';
 
 const commit: string = execSync('git rev-parse HEAD').toString().trim();
 
-type Constructor<T, Args extends any[]> = new (scope: any, ...args: Args) => T;
-
-const tfResourceToFunc = <T, Args extends any[]>(Klass: Constructor<T, Args>): ((...args: Args) => T) =>
-  (...args: Args) => new Klass(scope, ...args);
-
-new ShellProvider(scope, "shell-provider", {
-  enableParallelism: true,
-});
+new ShellProvider(scope, "shell-provider", { enableParallelism: true });
 
 const location = "europe-west1";
 const project = "ultimate-life-396919";
 const projectNumber = "1087863064045";
-
-const repo = gcloud.CloudBuildRepository("repo", {
-  name: "mcloud",
-  location,
-  parentConnection: "projects/ultimate-life-396919/locations/europe-west1/connections/gh",
-  remoteUri: `https://github.com/albean/multi-cloud.git`
-})
 
 const instance = gcloud.SqlDatabaseInstance("db-instance", {
   name: "main",
@@ -74,8 +37,7 @@ const user = gcloud.SqlUser("db-user", {
   password: "Tzh-RTPe-C9fkLmAHwxhb3hyU!e@u4"
 })
 
-
-const database = gcloud.SqlDatabase("db", { name: "prod", instance: instance.id })
+gcloud.SqlDatabase("db", { name: "prod", instance: instance.id })
 
 instance.dnsName
 
@@ -101,14 +63,6 @@ gcloud.ServiceAccountIamBinding("iam-biding", {
 })
 
 
-// const image = `${dockerRepo.location}-docker.pkg.dev/${project}/${dockerRepo.name}/main`;
-// const tag = `${dockerRepo.location}-docker.pkg.dev/${project}/${dockerRepo.name}/main:ts-0104`;
-
-// gcloud.Out("image", { value: image })
-
-
-// gcloud.Out("service-url", { value: service.uri })
-
 const pubSubSa = singletone(() => {
   const sa = gcloud.ServiceAccount("pubsub-service-account", {
     displayName: "Cloud Run Pub/Sub Invoker",
@@ -124,18 +78,18 @@ const pubSubSa = singletone(() => {
   return sa;
 });
 
-const QueueImpementation = implement(Queue, (props): { topic: gcloud.PubsubTopic, id: string } => {
+const Queue = implement(infra.Queue, (props): { topic: gcloud.PubsubTopic, id: string } => {
   const topic = gcloud.PubsubTopic(props.name, { name: `dev-${props.name}-topic`})
 
   return { topic, id: topic.name };
 })
 
-const SecretImplementation = implement(Secret, (p): { prefix: string } => {
+const Secret = implement(infra.Secret, (p): { prefix: string } => {
   return { prefix: p.name };
 })
 
-const SecretKeyImplementation = implement(SecretKey, (p): { id: string } => {
-  const prf = $gcloud(p.secret).prefix
+const SecretKey = implement(infra.SecretKey, (p): { id: string } => {
+  const prf = Secret.getProps(p.secret).prefix
 
   const secret = gcloud.SecretManagerSecret(`${prf}-${p.key}-secret`, {
     secretId: `${prf}-${p.key}`,
@@ -145,72 +99,11 @@ const SecretKeyImplementation = implement(SecretKey, (p): { id: string } => {
   return { id: secret.id };
 })
 
-const PipelineImplementation = implement(Pipeline, (p): {  } => {
-  const image = `${$gcloud(p.repo.repo).url}${p.repo.path}`;
-
-  const envs = p.args ?
-    Object.entries(p.args).map(([k,v]) => `_ARG_${k}=${v}`)
-  : [];
-
-  const args = p.args ?
-    Object.entries(p.args).map(([k,v]) => `--build-arg "${k}=$_ARG_${k}"`).join(" ")
-  : "";
-
-  gcloud.CloudBuildTrigger(`pipeline-${p.name}`, {
-    name: p.name,
-    location,
-    repositoryEventConfig: {
-      repository: repo.id,
-      push: { branch: "main" },
-    },
-    buildAttribute: {
-      step: [
-        {
-          name: "gcr.io/cloud-builders/docker",
-          script: [
-            `set -e`,
-            `echo 'docker build --platform linux/amd64 --progress plain -t image -f ${p.dockerfile} ${args} .'`,
-            `echo "docker build --platform linux/amd64 --progress plain -t image -f ${p.dockerfile} ${args} ."`,
-            `docker build --platform linux/amd64 --progress plain -t image -f ${p.dockerfile} ${args} .`,
-            "echo 'Building...'",
-            `export TAG="$(date +%y%m%d)-$(openssl rand -hex 16 | head -c 10)"`,
-            "echo $REPO:$TAG",
-            "docker tag image $REPO:$TAG",
-            "docker push $REPO:$TAG",
-            "echo $REPO:$TAG > image.txt",
-          ].join(";\n"),
-          env: [
-            `REPO=${image}`,
-            ...envs,
-          ]
-        },
-        {
-          name: "gcr.io/google.com/cloudsdktool/cloud-sdk",
-          script: [
-            `set -e`,
-            `export IMAGE=$(cat image.txt)`,
-            `echo "Deploying location $IMAGE"`,
-            ...p.services.map(_ => $gcloud(_)).flatMap(s => [
-              `echo "------------"`,
-              `echo "IMAGE: $IMAGE"`,
-              `echo "gcloud run deploy ${s.tfService.name} --image $IMAGE --region ${location}"`,
-              `gcloud run deploy ${s.tfService.name} --image $IMAGE --region ${location}`,
-              `echo "------------"`,
-            ]),
-          ].join(";\n"),
-        },
-      ],
-    },
-  });
-
-  return {};
-})
-
-const ServiceImplementation = implement(Service, (p): { name: string, tfService: gcloud.CloudRun, exposedUrl: string } => {
+const Service = implement(infra.Service, (p): { name: string, tfService: gcloud.CloudRun, exposedUrl: string } => {
   const secretsEnvs: any[] = [];
 
   p.secrets?.forEach(s => {
-    const secret = $gcloud(s.secret);
+    const secret = SecretKey.getProps(s.secret);
 
     secretsEnvs.push({
       name: s.name,
@@ -232,7 +125,7 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
     template: {
       scaling: { maxInstanceCount: 1, minInstanceCount: 0 },
       containers: [{
-        image: $gcloud(p.image).tag,
+        image: Image.getProps(p.image).tag,
         command: command,
         resources: { limits: {
           cpu: '1000m',
@@ -240,7 +133,8 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
         } },
         volumeMounts: [
           ...(p.mounts??[]).map(v => {
-            const storage = $gcloud(v.storage);
+            const storage = Storage.getProps(v.storage);
+
             return { name: storage.id, mountPath: v.path };
           }),
           { name: "cloudsql", mountPath: '/cloudsql' },
@@ -260,7 +154,7 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
       }],
       volumes: [
         ...(p.mounts??[]).map(v => {
-          const storage = $gcloud(v.storage);
+          const storage = Storage.getProps(v.storage);
           return { name: storage.id, gcs: { bucket: storage.name } }
         }),
         { name: "cloudsql", cloudSqlInstance: { instances: [ instance.connectionName ] } },
@@ -280,9 +174,9 @@ const ServiceImplementation = implement(Service, (p): { name: string, tfService:
   return { tfService: service, name, exposedUrl: service.uri };
 })
 
-const QueueConsumerImplementation = implement(QueueConsumer, (p): {} => {
-  const topic = $gcloud(p.queue).topic
-  const service = $gcloud(p.service)
+implement(infra.QueueConsumer, (p): {} => {
+  const topic = Queue.getProps(p.queue).topic
+  const service = Service.getProps(p.service)
 
   gcloud.CloudRunServiceIamBinding(`pubsub-service-${service.name}-binding`, {
     location: service.tfService.location,
@@ -291,7 +185,7 @@ const QueueConsumerImplementation = implement(QueueConsumer, (p): {} => {
     members: [ `serviceAccount:${pubSubSa().email}` ]
   });
 
-  const sub = gcloud.PubsubSubscription(`${service.name}-subscption`, {
+  gcloud.PubsubSubscription(`${service.name}-subscption`, {
     name: `${service.name}-subscption`,
     topic: topic.id,
     ackDeadlineSeconds: 10 * 60,
@@ -304,7 +198,7 @@ const QueueConsumerImplementation = implement(QueueConsumer, (p): {} => {
   return {};
 })
 
-const DockerRepositoryImplementation = implement(res.DockerRepository, (p): { url: string } => {
+const DockerRepository = implement(infra.DockerRepository, (p): { url: string } => {
   const dockerRepo = gcloud.ArtifactRegistryRepository(`repository-${p.name}`, {
     format: "docker",
     repositoryId: p.name,
@@ -314,7 +208,7 @@ const DockerRepositoryImplementation = implement(res.DockerRepository, (p): { ur
   };
 })
 
-const StorageBucket = implement(res.PersistantStorage, (p): { id: string, name: string } => {
+const Storage = implement(infra.PersistantStorage, (p): { id: string, name: string } => {
   const storage = gcloud.StorageBucket(p.name, {
     name: `multi-cloud-${p.name}-n2lj3`,
     location,
@@ -323,8 +217,8 @@ const StorageBucket = implement(res.PersistantStorage, (p): { id: string, name: 
   return { id: p.name, name: storage.name };
 })
 
-const Image = implement(res.Image, (p): { tag: string } => {
-  const imageTag = `${$gcloud(p.repo.repo).url}${p.repo.path}`;
+const Image = implement(infra.Image, (p): { tag: string } => {
+  const imageTag = `${DockerRepository.getProps(p.repo.repo).url}${p.repo.path}`;
 
   const args = p.args ?
     Object.entries(p.args).map(([k,v]) => `--build-arg "${k}=${v}"`).join(" ")
@@ -345,17 +239,6 @@ const Image = implement(res.Image, (p): { tag: string } => {
   });
 
   return { tag: `\${${image.fqn}.output.tag}` };
-})
-
-export const $gcloud = digest({
-  [QueueType]: QueueImpementation,
-  [SecretType]: SecretImplementation,
-  [SecretKeyType]: SecretKeyImplementation,
-  [PipelineType]: PipelineImplementation,
-  [ServiceType]: ServiceImplementation,
-  [res.PersistantStorageType]: StorageBucket,
-  [res.DockerRepositoryType]: DockerRepositoryImplementation,
-  [res.ImageType]: Image,
 })
 
 Application()
