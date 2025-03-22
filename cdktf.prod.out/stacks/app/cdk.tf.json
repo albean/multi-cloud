@@ -63,11 +63,11 @@
         "role": "roles/run.invoker",
         "service": "${google_cloud_run_v2_service.svc-frontend.name}"
       },
-      "pubsub-service-backend-consume-mail-binding": {
+      "pubsub-service-svc-backend-consume-mail-binding": {
         "//": {
           "metadata": {
-            "path": "app/pubsub-service-backend-consume-mail-binding",
-            "uniqueId": "pubsub-service-backend-consume-mail-binding"
+            "path": "app/pubsub-service-svc-backend-consume-mail-binding",
+            "uniqueId": "pubsub-service-svc-backend-consume-mail-binding"
           }
         },
         "location": "${google_cloud_run_v2_service.svc-backend-consume-mail.location}",
@@ -77,11 +77,11 @@
         "role": "roles/run.invoker",
         "service": "${google_cloud_run_v2_service.svc-backend-consume-mail.name}"
       },
-      "pubsub-service-backend-consume-render-binding": {
+      "pubsub-service-svc-backend-consume-render-binding": {
         "//": {
           "metadata": {
-            "path": "app/pubsub-service-backend-consume-render-binding",
-            "uniqueId": "pubsub-service-backend-consume-render-binding"
+            "path": "app/pubsub-service-svc-backend-consume-render-binding",
+            "uniqueId": "pubsub-service-svc-backend-consume-render-binding"
           }
         },
         "location": "${google_cloud_run_v2_service.svc-backend-consume-render.location}",
@@ -209,7 +209,7 @@
           "volumes": [
             {
               "gcs": {
-                "bucket": "attachments"
+                "bucket": "${google_storage_bucket.attachments.name}"
               },
               "name": "attachments"
             },
@@ -340,7 +340,7 @@
           "volumes": [
             {
               "gcs": {
-                "bucket": "attachments"
+                "bucket": "${google_storage_bucket.attachments.name}"
               },
               "name": "attachments"
             },
@@ -594,15 +594,15 @@
       }
     },
     "google_pubsub_subscription": {
-      "backend-consume-mail-subscption": {
+      "svc-backend-consume-mail-subscption": {
         "//": {
           "metadata": {
-            "path": "app/backend-consume-mail-subscption",
-            "uniqueId": "backend-consume-mail-subscption"
+            "path": "app/svc-backend-consume-mail-subscption",
+            "uniqueId": "svc-backend-consume-mail-subscption"
           }
         },
         "ack_deadline_seconds": 600,
-        "name": "backend-consume-mail-subscption",
+        "name": "svc-backend-consume-mail-subscption",
         "push_config": {
           "oidc_token": {
             "service_account_email": "${google_service_account.pubsub-service-account.email}"
@@ -611,15 +611,15 @@
         },
         "topic": "${google_pubsub_topic.email.id}"
       },
-      "backend-consume-render-subscption": {
+      "svc-backend-consume-render-subscption": {
         "//": {
           "metadata": {
-            "path": "app/backend-consume-render-subscption",
-            "uniqueId": "backend-consume-render-subscption"
+            "path": "app/svc-backend-consume-render-subscption",
+            "uniqueId": "svc-backend-consume-render-subscption"
           }
         },
         "ack_deadline_seconds": 600,
-        "name": "backend-consume-render-subscption",
+        "name": "svc-backend-consume-render-subscption",
         "push_config": {
           "oidc_token": {
             "service_account_email": "${google_service_account.pubsub-service-account.email}"
@@ -804,7 +804,7 @@
           "CWD": "/Users/billy/p/multi-cloud",
           "DIR": "backend",
           "REPO_URL": "${google_artifact_registry_repository.repository-app.location}-docker.pkg.dev/ultimate-life-396919/${google_artifact_registry_repository.repository-app.name}/backend",
-          "_VERSION": "6b57eb01e6baa70ceda6e3c7c16f0668e7dbbb41"
+          "_VERSION": "cf9eb4a410fa0f5bca917eefa766b48d7eb0985b"
         },
         "lifecycle_commands": {
           "create": "/Users/billy/p/multi-cloud/bin/script/build.sh",
@@ -823,7 +823,7 @@
           "CWD": "/Users/billy/p/multi-cloud",
           "DIR": "frontend",
           "REPO_URL": "${google_artifact_registry_repository.repository-app.location}-docker.pkg.dev/ultimate-life-396919/${google_artifact_registry_repository.repository-app.name}/frontend",
-          "_VERSION": "6b57eb01e6baa70ceda6e3c7c16f0668e7dbbb41"
+          "_VERSION": "cf9eb4a410fa0f5bca917eefa766b48d7eb0985b"
         },
         "lifecycle_commands": {
           "create": "/Users/billy/p/multi-cloud/bin/script/build.sh",

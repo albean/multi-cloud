@@ -13,7 +13,7 @@ export abstract class Resource<Props> {
     }
 
     const underlyingInstance = implementation(this.props);
-    instanceRegistry.set(this, {...underlyingInstance, ...props})
+    instanceRegistry.set(this, {...underlyingInstance })
 
     Object.assign(this, underlyingInstance)
   }
