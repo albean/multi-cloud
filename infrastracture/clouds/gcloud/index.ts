@@ -1,10 +1,10 @@
-import { implement } from "infrastracture/common/ResourceClass";
-import * as infra from "infrastracture/resources/class";
+import { implement } from "infrastracture/common/Resource";
+import * as infra from "infrastracture/resources";
 import { ShellProvider } from ".gen/providers/shell/provider";
 import { Script } from ".gen/providers/shell/script";
 import * as gcloud from "./resources"
 import { scope, app } from "infrastracture/clouds/gcloud/scope";
-import { Application } from "infrastracture/application/class";
+import { Application } from "infrastracture/application";
 import { singletone } from "common/utils";
 import { execSync } from 'child_process';
 

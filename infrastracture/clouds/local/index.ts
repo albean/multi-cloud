@@ -1,10 +1,10 @@
-import * as infra from "infrastracture/resources/class";
-import { implement } from "infrastracture/common/ResourceClass";
+import * as infra from "infrastracture/resources";
+import { implement } from "infrastracture/common/Resource";
 import { ShellProvider } from ".gen/providers/shell/provider";
 import { Script } from ".gen/providers/shell/script";
 import { App, TerraformStack } from "cdktf";
 import { LocalBackend } from 'cdktf';
-import { Application } from "infrastracture/application/class";
+import { Application } from "infrastracture/application";
 import * as crypto from 'crypto';
 
 const app = new App();

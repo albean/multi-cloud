@@ -1,64 +1,35 @@
-const impl = {} as any;
-const Values = new Map() as Map<any, any>;
+export const implementationRegistry = new Map<any, any>();
+export const instanceRegistry = new Map<any, any>();// infrastructure/library/resource.ts
 
-export type Resource<S extends symbol, Props, Attr = {}> = {
-  _symbol: S,
-  _props: Props,
-  _attr: Attr,
-}
+export abstract class Resource<Props> {
+  props: Props
 
-type Extension<T extends Record<string, (...args: any[]) => {}>> = {
-  [P in keyof T]: DropFirstArg<T[P]>;
-}
+  constructor(props: Props) {
+    this.props = props;
+    const implementation = implementationRegistry.get(this.constructor);
 
-export const Resource = <P, A = {}>() =>
-  <T extends symbol, E extends Record<string, (itself: Resource<T, P> & E, ...args: any) => any>>(symbol: T, extension: E) => {
-    const res = (props: P): Resource<T, P, A> & Extension<E> & A => {
-      const resource = {};
+    if (!implementation) {
+      return;
+    }
 
-      const fn = impl[symbol];
+    const underlyingInstance = implementation(this.props);
+    instanceRegistry.set(this, {...underlyingInstance })
 
-      const attr = fn ? fn(props) : {};
-      Values.set(resource, attr);
-
-      Object.entries(extension).map(([k, v]) => {
-        resource[k] = (...args: any) => extension[k](resource as any, ...args) as any
-      });
-
-      Object.assign(resource, attr);
-
-      return resource as any;
-    };
-
-    res._symbol = symbol;
-
-    return res;
+    Object.assign(this, underlyingInstance)
   }
+}
 
-const any: any = {};
+type Instance<T> = T extends new (...args: any[]) => infer R ? R : never;
+type Props<T> = T extends typeof Resource<infer Props> ? Props : never;
 
-type DropFirstInTuple<T extends unknown[]> = T extends [any, ...infer U] ? U : never;
-
-type DropFirstArg<T> = T extends (...args: infer Args) => infer R
-  ? (...args: DropFirstInTuple<Args>) => R
-  : never;
-
-export const implement = <P, A, R extends A>(res: (props: P) => Resource<any, any, A>, _impl: (props: P) => R) => {
-  const symbol = (res as any)._symbol;
-  // console.log("Registered implementation", symbol)
-  impl[symbol] = _impl;
-
-  return _impl;
+type ImplementFn = <Class, P>(klass: Class, implementation: (prp: Props<Class>) => P) => {
+  getProps: (i: Instance<Class>) => P & Props<Class>
 };
 
+export const implement: ImplementFn = (klass, imp) => {
+  implementationRegistry.set(klass, imp)
 
-export const digest = <V extends Record<K, any>, K extends symbol & keyof V>(spec: V) =>
-  <S extends K>(of: Resource<S, any>) => {
-    const val = Values.get(of)
-
-    return val as ReturnType<V[S]>
+  return {
+    getProps: (instance) => instanceRegistry.get(instance)
   }
-
-
-
-
+}

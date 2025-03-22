@@ -1,8 +1,3 @@
-import { digest } from "infrastracture/common/Resource";
-import { ShellProvider } from ".gen/providers/shell/provider";
-import { Script } from ".gen/providers/shell/script";
-import { App, TerraformStack } from "cdktf";
-import { GoogleProvider } from "@cdktf/provider-google/lib/provider";
 import { CloudRunV2Service } from "@cdktf/provider-google/lib/cloud-run-v2-service";
 import { CloudbuildTrigger } from "@cdktf/provider-google/lib/cloudbuild-trigger";
 import { Cloudbuildv2Repository } from "@cdktf/provider-google/lib/cloudbuildv2-repository";

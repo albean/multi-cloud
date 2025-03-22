@@ -1,23 +1,26 @@
 import { Resource } from "../common/Resource";
 
-export const QueueType = Symbol("QueueType");
-export const Queue = Resource<{ name: string }, { id: string }>()(QueueType, {});
-export type Queue = Resource<typeof QueueType, {}>
+export class Secret extends Resource<{ name: string; }> {
+  id: string
 
-export const SecretType = Symbol("SecretType");
-export const Secret = Resource<{ name: string }>()(SecretType, {
-  key: (secret, key: string) => {
-    return SecretKey({ secret, key });
+  key(key: string) {
+    return new SecretKey({ secret: this, key });
   }
-});
-export type Secret = Resource<typeof SecretType, {}>
+}
+export class SecretKey extends Resource<{ secret: Secret, key: string }> { id: string }
 
-export const SecretKeyType = Symbol("SecretKeyType");
-export const SecretKey = Resource<{ secret: Secret, key: string }>()(SecretKeyType, {});
-export type SecretKey = Resource<typeof SecretKeyType, {}>
+export class DockerRepository extends Resource<{ name: string }> {}
+export class Queue extends Resource<{ name: string }> { id: string }
+export class PersistantStorage extends Resource<{ name: string }> {}
+export class QueueConsumer extends Resource<{ queue: Queue, service: Service }> {}
 
-export const ServiceType = Symbol("ServiceType");
-export const Service = Resource<{
+export class Image extends Resource<{
+  repo: DockerRepositoryPath,
+  dir: string,
+  args?: Record<string, string>;
+}> { id: string }
+
+interface ServiceProps {
   image: Image,
   name: string;
   command?: string[];
@@ -26,45 +29,15 @@ export const Service = Resource<{
   memory?: number;
   expose?: boolean;
   mounts?: { storage: PersistantStorage, path: string }[],
-}, {
-  exposedUrl: string
-}>()(ServiceType, {
-  consume: (service, queue: Queue) => {
-    return QueueConsumer({ service, queue });
-  },
-});
-export type Service = Resource<typeof ServiceType, {}>
-
-export const DockerRepositoryType = Symbol("DockerRepositoryType");
-export const DockerRepository = Resource<{
-  name: string,
-}, {
-  url: string
-} >()(DockerRepositoryType, {});
-export type DockerRepository = Resource<typeof DockerRepositoryType, {}>
-
-export const QueueConsumerType = Symbol("QueueConsumerType");
-export const QueueConsumer = Resource<{ queue: Queue, service: Service }>()(QueueConsumerType, {});
-export type QueueConsumer = Resource<typeof QueueConsumerType, {}>
-
-interface PipelineProps {
-  name: string,
-  dockerfile: string,
-  args?: Record<string, string>,
-  services: Service[],
-  repo: DockerRepositoryPath;
 }
-export const PipelineType = Symbol("PipelineType");
-export const Pipeline = Resource<PipelineProps>()(PipelineType, {});
-export type Pipeline = Resource<typeof PipelineType, {}>
 
-export const PersistantStorageType = Symbol("PersistantStorageType");
-export const PersistantStorage = Resource<{ name: string }>()(PersistantStorageType, {});
-export type PersistantStorage = Resource<typeof PersistantStorageType, {}>
+export class Service extends Resource<ServiceProps> {
+  exposedUrl: string
 
-export const ImageType = Symbol("ImageType");
-export const Image = Resource<{ repo: DockerRepositoryPath, dir: string, args?: Record<string, string> }>()(ImageType, {});
-export type Image = Resource<typeof ImageType, {}>
+  consume(queue: Queue) {
+    return new QueueConsumer({ service: this, queue });
+  }
+}
 
 export interface DockerRepositoryPath {
   repo: DockerRepository,
