@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 export function useAsync<T>(asyncFn: () => Promise<T>) {
