@@ -1,10 +1,10 @@
-import { digest, implement } from "infrastracture/common/Resource";
+import * as infra from "infrastracture/resources/class";
+import { implement } from "infrastracture/common/ResourceClass";
 import { ShellProvider } from ".gen/providers/shell/provider";
 import { Script } from ".gen/providers/shell/script";
-import * as res from "infrastracture/resources";
 import { App, TerraformStack } from "cdktf";
 import { LocalBackend } from 'cdktf';
-import { Application } from "infrastracture/application";
+import { Application } from "infrastracture/application/class";
 import * as crypto from 'crypto';
 
 const app = new App();
@@ -20,9 +20,7 @@ const yamlResources: Script[] = []
 
 new ShellProvider(scope, "shell-provider", { enableParallelism: true });
 
-new LocalBackend(scope, {
-  path: 'cdktf.out/state/terraform.tfstate'
-});
+new LocalBackend(scope, { path: 'cdktf.out/state/terraform.tfstate' });
 
 const resource = <T>(id: string, command: string, env: Record<string, string>) => {
   const constr = new Script(scope, id, {
@@ -111,7 +109,7 @@ const backend = ComposeService("postgres", {
 
 let lastPort = 8100;
 
-const ServiceImpl = implement(res.Service, (p): { exposedUrl: string, version: string, id: string } => {
+implement(infra.Service, (p): { exposedUrl: string, version: string, id: string } => {
   const port = 8100 + hash(p.name);
   const ports = p.expose ? [`${port}:8080`] : [];
   const id = p.name.replace(/\-/g, "_");
@@ -142,7 +140,7 @@ const ServiceImpl = implement(res.Service, (p): { exposedUrl: string, version: s
     ports,
     command: p.command,
     volumes: p.mounts?.map(m => {
-      const st = $local(m.storage).name;
+      const st = Storage.getProps(m.storage).name;
 
       return `${st}:${m.path}`;
     }) ?? []
@@ -155,33 +153,12 @@ const ServiceImpl = implement(res.Service, (p): { exposedUrl: string, version: s
   };
 })
 
-implement(res.Pipeline, (p): {} => {
-  p.services.map(s => {
-    const id = $local(s).id;
-    const version = $local(s).version;
-    patch(`services.${id}.build`, {
-      dockerfile: p.dockerfile,
-      context: ".",
-      args: {
-        ...p.args,
-        VERSION: version,
-      }
-    });
-  })
-  return {};
-})
-
-const PersistantStorageImpl = implement(res.PersistantStorage, (p): { name: string } => {
+const Storage = implement(infra.PersistantStorage, (p): { name: string } => {
   const name = `${p.name}_v3`
   patch(`volumes.${name}`, {});
 
   return { name: name };
 })
-
-const $local = digest({
-  [res.ServiceType]: ServiceImpl,
-  [res.PersistantStorageType]: PersistantStorageImpl,
-});
 
 Application()
 
