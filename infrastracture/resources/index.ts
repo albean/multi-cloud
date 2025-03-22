@@ -3,16 +3,23 @@ import { Resource } from "../common/Resource";
 export class Secret extends Resource<{ name: string; }> {
   id: string
 
-  key(key: string) {
-    return new SecretKey({ secret: this, key });
+  key(name: string) {
+    return new SecretKey({ secret: this, key: name });
   }
 }
-export class SecretKey extends Resource<{ secret: Secret, key: string }> { id: string }
+export class SecretKey extends Resource<{
+  secret: Secret;
+  key: string;
+}> {}
 
 export class DockerRepository extends Resource<{ name: string }> {}
 export class Queue extends Resource<{ name: string }> { id: string }
 export class PersistantStorage extends Resource<{ name: string }> {}
-export class QueueConsumer extends Resource<{ queue: Queue, service: Service }> {}
+
+export class QueueConsumer extends Resource<{
+  queue: Queue;
+  service: Service;
+}> {}
 
 export class Image extends Resource<{
   repo: DockerRepositoryPath,

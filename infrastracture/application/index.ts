@@ -7,8 +7,6 @@ export const Application = () => {
   const backendRepoPath: infra.DockerRepositoryPath = { repo, path: "backend" };
   const frontendRepoPath: infra.DockerRepositoryPath = { repo, path: "frontend" };
 
-  const backendServices: infra.Service[] = [];
-
   const backendImage = new infra.Image({ repo: backendRepoPath, dir: "backend" })
 
   const storage = new infra.PersistantStorage({ name: "attachments" });
@@ -34,7 +32,6 @@ export const Application = () => {
     });
 
     consumer.consume(queue)
-    backendServices.push(consumer);
 
     return consumer;
   }
@@ -55,14 +52,16 @@ export const Application = () => {
     expose: true,
   });
 
-  backendServices.push(service)
-
   queueConsumer("mail", mailQueue);
   queueConsumer("render", renderQueue, 4);
 
-  const frontendImage = new infra.Image({ repo: frontendRepoPath, dir: "frontend", args: {
-    BACKEND_PREFIX: service.exposedUrl,
-  }})
+  const frontendImage = new infra.Image({
+    repo: frontendRepoPath,
+    dir: "frontend",
+    args: {
+      BACKEND_PREFIX: service.exposedUrl,
+    },
+  })
 
   new infra.Service({
     name: "frontend",
