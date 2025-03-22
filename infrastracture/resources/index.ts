@@ -12,7 +12,6 @@ export const Secret = Resource<{ name: string }>()(SecretType, {
 });
 export type Secret = Resource<typeof SecretType, {}>
 
-
 export const SecretKeyType = Symbol("SecretKeyType");
 export const SecretKey = Resource<{ secret: Secret, key: string }>()(SecretKeyType, {});
 export type SecretKey = Resource<typeof SecretKeyType, {}>

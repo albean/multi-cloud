@@ -42,8 +42,6 @@ new ShellProvider(scope, "shell-provider", {
   enableParallelism: true,
 });
 
-
-
 const location = "europe-west1";
 const project = "ultimate-life-396919";
 const projectNumber = "1087863064045";
