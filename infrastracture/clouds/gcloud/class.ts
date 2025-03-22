@@ -220,8 +220,6 @@ const Storage = implement(infra.PersistantStorage, (p): { id: string, name: stri
 const Image = implement(infra.Image, (p): { tag: string } => {
   const imageTag = `${DockerRepository.getProps(p.repo.repo).url}${p.repo.path}`;
 
-  console.log({imageTag, args: p.args})
-
   const args = p.args ?
     Object.entries(p.args).map(([k,v]) => `--build-arg "${k}=${v}"`).join(" ")
   : "";

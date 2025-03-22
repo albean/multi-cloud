@@ -12,7 +12,7 @@ export const Application = () => {
   const backendImage = new infra.Image({ repo: backendRepoPath, dir: "backend" })
 
   const storage = new infra.PersistantStorage({ name: "attachments" });
-  //
+
   const mailQueue = new infra.Queue({ name: "email" })
   const renderQueue = new infra.Queue({ name: "render" })
 
@@ -20,7 +20,7 @@ export const Application = () => {
     { name: "QUEUE_MAIL_ID", value: mailQueue.id },
     { name: "QUEUE_RENDER_ID", value: renderQueue.id },
   ];
-  //
+
   const queueConsumer = (name: string, queue: infra.Queue, memory = 1) => {
 
     const consumer = new infra.Service({

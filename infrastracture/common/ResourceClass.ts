@@ -8,12 +8,14 @@ export abstract class Resource<Props> {
     this.props = props;
     const implementation = implementationRegistry.get(this.constructor);
 
-    if (!implement) {
-      throw new Error("This resource has not been implemented.")
+    if (!implementation) {
+      return;
     }
 
     const underlyingInstance = implementation(this.props);
     instanceRegistry.set(this, {...underlyingInstance, ...props})
+
+    Object.assign(this, underlyingInstance)
   }
 }
 
