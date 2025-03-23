@@ -16,18 +16,10 @@ export function hash(): string {
 export function run(cmdWithArgs: string[]): Promise<string> {
   return new Promise((resolve, reject) => {
     const [cmd, ...args] = cmdWithArgs;
-    const proc = spawn(cmd, args);
+    const proc = spawn(cmd, args, { stdio: 'inherit' });
 
     let output = '';
     let err = '';
-
-    proc.stdout.on('data', data => {
-      console.log(
-        (data + "").trim().split("\n").map(line => `docker: ${line}`).join("\n")
-      )
-    });
-
-    proc.stderr.on('data', data => { err += (data.toString()) });
 
     proc.on('close', (code) => {
       if (code === 0) {
