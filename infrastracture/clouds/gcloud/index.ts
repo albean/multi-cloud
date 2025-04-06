@@ -1,3 +1,4 @@
+#!/usr/bin/env ts-node
 import { implement } from "infrastracture/common/Resource";
 import * as infra from "infrastracture/resources";
 import { ShellProvider } from ".gen/providers/shell/provider";
