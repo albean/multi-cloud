@@ -36,6 +36,5 @@ export const PubsubSubscription = tfResourceToFunc(gcloud.pubsubSubscription.Pub
 export const Out = tfResourceToFunc(TerraformOutput);
 
 export const location = "europe-west1";
-export const project = "ultimate-life-396919";
 export const projectNumber = "1087863064045";
 
