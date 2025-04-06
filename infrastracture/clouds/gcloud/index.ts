@@ -15,7 +15,7 @@ const commit: string = execSync('git rev-parse HEAD').toString().trim();
 new ShellProvider(scope, "shell-provider", { enableParallelism: true });
 
 const location = "europe-west1";
-const project = "ultimate-life-396919";
+const project = process.env.GCLOUD_PROJECT_ID;
 const projectNumber = "1087863064045";
 
 const instance = gcloud.SqlDatabaseInstance("db-instance", {
