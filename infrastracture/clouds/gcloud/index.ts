@@ -178,8 +178,8 @@ implement(infra.QueueConsumer, (p): {} => {
     members: [ `serviceAccount:${pubSubSa().email}` ]
   });
 
-  gcloud.PubsubSubscription(`${service.name}-subscption`, {
-    name: `${service.name}-subscption`,
+  gcloud.PubsubSubscription(`${service.name}-subscription`, {
+    name: `${service.name}-subscription`,
     topic: topic.id,
     ackDeadlineSeconds: 10 * 60,
     pushConfig: {
