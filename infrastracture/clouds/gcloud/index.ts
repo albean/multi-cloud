@@ -15,6 +15,7 @@ const commit: string = execSync('git rev-parse HEAD').toString().trim();
 new ShellProvider(scope, "shell-provider", { enableParallelism: true });
 
 const location = "europe-west1";
+const pass = process.env.GCLOUD_PASS || "final";
 const project = process.env.GCLOUD_PROJECT_ID || "";
 const projectNumber = process.env.GCLOUD_PROJECT_NUMBER || "";
 
@@ -108,7 +109,6 @@ const Service = implement(infra.Service, (p): { name: string, tfService: gcloud.
 
   const command = p.command ? ["bash", "/app/entry", ...p.command] : undefined;
 
-
   const service = gcloud.CloudRun(name, {
     name: `app-${p.name}`,
     location,
@@ -132,7 +132,7 @@ const Service = implement(infra.Service, (p): { name: string, tfService: gcloud.
           { name: "cloudsql", mountPath: '/cloudsql' },
         ],
         env: [
-          { name: "VER", value: "v23" },
+          { name: "VER", value: "v23-" + pass },
 
           { name: "QUEUE_BACKEND", value: "pubsub" },
 
@@ -141,8 +141,8 @@ const Service = implement(infra.Service, (p): { name: string, tfService: gcloud.
           { name: "DB_USER", value: user.name },
           { name: "DB_PASS", value: user.password },
           ...secretsEnvs,
-          ...(p.env ?? []),
         ],
+          ...(p.env ?? []),
       }],
       volumes: [
         ...(p.mounts??[]).map(v => {
