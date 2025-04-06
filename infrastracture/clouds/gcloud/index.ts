@@ -9,6 +9,7 @@ import { scope, app } from "infrastracture/clouds/gcloud/scope";
 import { Application } from "infrastracture/application";
 import { singletone } from "common/utils";
 import { execSync } from 'child_process';
+import * as crypto from 'crypto';
 
 const commit: string = execSync('git rev-parse HEAD').toString().trim();
 
@@ -201,8 +202,10 @@ const DockerRepository = implement(infra.DockerRepository, (p): { url: string } 
 })
 
 const Storage = implement(infra.PersistantStorage, (p): { id: string, name: string } => {
+  const projectHash = crypto.createHash('md5').update(project).digest('hex');
+
   const storage = gcloud.StorageBucket(p.name, {
-    name: `multi-cloud-${p.name}-n2lj3`,
+    name: `multi-cloud-${p.name}-${projectHash}`,
     location,
   });
 
