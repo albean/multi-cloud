@@ -57,9 +57,7 @@ ComposeService("postgres", {
     POSTGRES_PASSWORD: "password",
     POSTGRES_DB: "mydb"
   },
-  ports: [
-    "5532:5432"
-  ]
+  ports: ["5532:5432"],
 })
 
 implement(infra.Service, (p): { exposedUrl: string, version: string, id: string } => {
