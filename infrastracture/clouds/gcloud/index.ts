@@ -142,8 +142,8 @@ const Service = implement(infra.Service, (p): { name: string, tfService: gcloud.
           { name: "DB_USER", value: user.name },
           { name: "DB_PASS", value: user.password },
           ...secretsEnvs,
-        ],
           ...(p.env ?? []),
+        ],
       }],
       volumes: [
         ...(p.mounts??[]).map(v => {
