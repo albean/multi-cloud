@@ -16,7 +16,7 @@ new ShellProvider(scope, "shell-provider", { enableParallelism: true });
 
 const location = "europe-west1";
 const project = process.env.GCLOUD_PROJECT_ID || "";
-const projectNumber = "1087863064045";
+const projectNumber = process.env.GCLOUD_PROJECT_NUMBER || "";
 
 const instance = gcloud.SqlDatabaseInstance("db-instance", {
   name: "main",
@@ -40,8 +40,6 @@ const user = gcloud.SqlUser("db-user", {
 })
 
 gcloud.SqlDatabase("db", { name: "prod", instance: instance.id })
-
-instance.dnsName
 
 const email = `${projectNumber}-compute@developer.gserviceaccount.com`;
 const member = `serviceAccount:${email}`;
