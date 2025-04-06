@@ -44,9 +44,9 @@ gcloud.SqlDatabase("db", { name: "prod", instance: instance.id })
 const email = `${projectNumber}-compute@developer.gserviceaccount.com`;
 const member = `serviceAccount:${email}`;
 
-
 gcloud.ProjectIamMember("binding-registry", { member, project, role: "roles/artifactregistry.writer" });
 gcloud.ProjectIamMember("binding-storage", { member, project, role: "roles/storage.admin" });
+gcloud.ProjectIamMember("binding-secrets", { member, project, role: "roles/secretmanager.secretAccessor" });
 
 gcloud.ServiceAccountIamBinding("iam-biding", {
   serviceAccountId: `projects/${project}/serviceAccounts/${email}`,
