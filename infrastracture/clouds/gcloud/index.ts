@@ -94,15 +94,15 @@ const SecretKey = implement(infra.SecretKey, (p): { id: string } => {
 })
 
 const Service = implement(infra.Service, (p): { name: string, tfService: gcloud.CloudRun, exposedUrl: string } => {
-  const secretsEnvs: any[] = [];
-
-  p.secrets?.forEach(s => {
+  const secretsEnvs: any[] = (p.secrets ?? []).map(s => {
     const secret = SecretKey.getProps(s.secret);
 
-    secretsEnvs.push({
+    return {
       name: s.name,
-      valueSource: { secretKeyRef: { secret: secret.id, version: 'latest' } },
-    });
+      valueSource: {
+        secretKeyRef: { secret: secret.id, version: 'latest' }
+      },
+    };
   })
 
   const name = `svc-${p.name}`;
