@@ -1,3 +1,4 @@
+import { range } from "common/utils";
 import * as infra from "infrastracture/resources";
 
 export const Application = () => {
@@ -51,6 +52,11 @@ export const Application = () => {
   });
 
   queueConsumer("render", renderQueue, 4);
+
+  for (const i of range(1, 10)) {
+    const queue = new infra.Queue({ name: `queue-${i}` })
+    queueConsumer(`queue-${i}`, queue, 1);
+  }
 
   const frontendImage = new infra.Image({
     repo: frontendRepoPath,
