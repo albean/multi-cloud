@@ -125,5 +125,5 @@ run([
   'docker', 'compose', '-p', 'multi_app',
   '-f', 'build/docker-compose.yml',
   '--project-directory', process.cwd(),
-  'up', '-d', ...args
+  'up', '-d', '--build', ...args
 ]).catch(console.error);
