@@ -14,8 +14,6 @@ export const Application = () => {
   const mailQueue = new infra.Queue({ name: "email" })
   const renderQueue = new infra.Queue({ name: "render" })
 
-  console.log(`MAIL_ID`, mailQueue.id)
-
   const queuesEnv = [
     { name: "QUEUE_MAIL_ID", value: mailQueue.id },
     { name: "QUEUE_RENDER_ID", value: renderQueue.id },
