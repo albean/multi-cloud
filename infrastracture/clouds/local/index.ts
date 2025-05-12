@@ -89,6 +89,7 @@ implement(infra.Service, (p): { exposedUrl: string, version: string, id: string 
 
       QUEUE_BACKEND: "redis",
       QUEUE_HOST: "redis",
+      QUEUE_MAIL_ID: "dev-mail-topic",
     },
     ports,
     command: p.command,

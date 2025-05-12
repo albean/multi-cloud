@@ -11,9 +11,13 @@ export const Application = () => {
 
   const storage = new infra.PersistantStorage({ name: "attachments" });
 
+  const mailQueue = new infra.Queue({ name: "email" })
   const renderQueue = new infra.Queue({ name: "render" })
 
+  console.log(`MAIL_ID`, mailQueue.id)
+
   const queuesEnv = [
+    { name: "QUEUE_MAIL_ID", value: mailQueue.id },
     { name: "QUEUE_RENDER_ID", value: renderQueue.id },
   ];
 
@@ -50,6 +54,7 @@ export const Application = () => {
     expose: true,
   });
 
+  queueConsumer("mail", mailQueue);
   queueConsumer("render", renderQueue, 4);
 
   const frontendImage = new infra.Image({
