@@ -63,20 +63,6 @@
         "role": "roles/run.invoker",
         "service": "${google_cloud_run_v2_service.svc-frontend.name}"
       },
-      "pubsub-service-svc-backend-consume-mail-binding": {
-        "//": {
-          "metadata": {
-            "path": "app/pubsub-service-svc-backend-consume-mail-binding",
-            "uniqueId": "pubsub-service-svc-backend-consume-mail-binding"
-          }
-        },
-        "location": "${google_cloud_run_v2_service.svc-backend-consume-mail.location}",
-        "members": [
-          "serviceAccount:${google_service_account.pubsub-service-account.email}"
-        ],
-        "role": "roles/run.invoker",
-        "service": "${google_cloud_run_v2_service.svc-backend-consume-mail.name}"
-      },
       "pubsub-service-svc-backend-consume-render-binding": {
         "//": {
           "metadata": {
@@ -93,137 +79,6 @@
       }
     },
     "google_cloud_run_v2_service": {
-      "svc-backend-consume-mail": {
-        "//": {
-          "metadata": {
-            "path": "app/svc-backend-consume-mail",
-            "uniqueId": "svc-backend-consume-mail"
-          }
-        },
-        "deletion_protection": false,
-        "ingress": "INGRESS_TRAFFIC_ALL",
-        "location": "europe-west1",
-        "name": "app-backend-consume-mail",
-        "template": {
-          "containers": [
-            {
-              "command": [
-                "bash",
-                "/app/entry",
-                "consume",
-                "mail"
-              ],
-              "env": [
-                {
-                  "name": "VER",
-                  "value": "v23-final"
-                },
-                {
-                  "name": "QUEUE_BACKEND",
-                  "value": "pubsub"
-                },
-                {
-                  "name": "DB_HOST",
-                  "value": "${google_sql_database_instance.db-instance.ip_address[0].ip_address}"
-                },
-                {
-                  "name": "DB_NAME",
-                  "value": "prod"
-                },
-                {
-                  "name": "DB_USER",
-                  "value": "${google_sql_user.db-user.name}"
-                },
-                {
-                  "name": "DB_PASS",
-                  "value": "${google_sql_user.db-user.password}"
-                },
-                {
-                  "name": "SMTP_HOST",
-                  "value_source": {
-                    "secret_key_ref": {
-                      "secret": "${google_secret_manager_secret.smtp-host-secret.id}",
-                      "version": "latest"
-                    }
-                  }
-                },
-                {
-                  "name": "SMTP_PORT",
-                  "value_source": {
-                    "secret_key_ref": {
-                      "secret": "${google_secret_manager_secret.smtp-port-secret.id}",
-                      "version": "latest"
-                    }
-                  }
-                },
-                {
-                  "name": "SMTP_USER",
-                  "value_source": {
-                    "secret_key_ref": {
-                      "secret": "${google_secret_manager_secret.smtp-user-secret.id}",
-                      "version": "latest"
-                    }
-                  }
-                },
-                {
-                  "name": "SMTP_PASS",
-                  "value_source": {
-                    "secret_key_ref": {
-                      "secret": "${google_secret_manager_secret.smtp-pass-secret.id}",
-                      "version": "latest"
-                    }
-                  }
-                },
-                {
-                  "name": "QUEUE_MAIL_ID",
-                  "value": "${google_pubsub_topic.email.name}"
-                },
-                {
-                  "name": "QUEUE_RENDER_ID",
-                  "value": "${google_pubsub_topic.render.name}"
-                }
-              ],
-              "image": "${shell_script.build_backend.output.tag}",
-              "resources": {
-                "limits": {
-                  "cpu": "1000m",
-                  "memory": "1Gi"
-                }
-              },
-              "volume_mounts": [
-                {
-                  "mount_path": "/var/attachments",
-                  "name": "attachments"
-                },
-                {
-                  "mount_path": "/cloudsql",
-                  "name": "cloudsql"
-                }
-              ]
-            }
-          ],
-          "scaling": {
-            "max_instance_count": 1,
-            "min_instance_count": 0
-          },
-          "volumes": [
-            {
-              "gcs": {
-                "bucket": "${google_storage_bucket.attachments.name}"
-              },
-              "name": "attachments"
-            },
-            {
-              "cloud_sql_instance": {
-                "instances": [
-                  "${google_sql_database_instance.db-instance.connection_name}"
-                ]
-              },
-              "name": "cloudsql"
-            }
-          ]
-        }
-      },
       "svc-backend-consume-render": {
         "//": {
           "metadata": {
@@ -304,10 +159,6 @@
                       "version": "latest"
                     }
                   }
-                },
-                {
-                  "name": "QUEUE_MAIL_ID",
-                  "value": "${google_pubsub_topic.email.name}"
                 },
                 {
                   "name": "QUEUE_RENDER_ID",
@@ -434,10 +285,6 @@
                       "version": "latest"
                     }
                   }
-                },
-                {
-                  "name": "QUEUE_MAIL_ID",
-                  "value": "${google_pubsub_topic.email.name}"
                 },
                 {
                   "name": "QUEUE_RENDER_ID",
@@ -594,23 +441,6 @@
       }
     },
     "google_pubsub_subscription": {
-      "svc-backend-consume-mail-subscription": {
-        "//": {
-          "metadata": {
-            "path": "app/svc-backend-consume-mail-subscription",
-            "uniqueId": "svc-backend-consume-mail-subscription"
-          }
-        },
-        "ack_deadline_seconds": 600,
-        "name": "svc-backend-consume-mail-subscription",
-        "push_config": {
-          "oidc_token": {
-            "service_account_email": "${google_service_account.pubsub-service-account.email}"
-          },
-          "push_endpoint": "${google_cloud_run_v2_service.svc-backend-consume-mail.uri}"
-        },
-        "topic": "${google_pubsub_topic.email.id}"
-      },
       "svc-backend-consume-render-subscription": {
         "//": {
           "metadata": {
@@ -630,15 +460,6 @@
       }
     },
     "google_pubsub_topic": {
-      "email": {
-        "//": {
-          "metadata": {
-            "path": "app/email",
-            "uniqueId": "email"
-          }
-        },
-        "name": "dev-email-topic"
-      },
       "render": {
         "//": {
           "metadata": {
@@ -804,7 +625,7 @@
           "CWD": "/Users/billy/p/multi-cloud",
           "DIR": "backend",
           "REPO_URL": "${google_artifact_registry_repository.repository-app.location}-docker.pkg.dev/ultimate-life-396919/${google_artifact_registry_repository.repository-app.name}/backend",
-          "_VERSION": "dadccb3e3bb6ce2487b809b039dec3706eef437c"
+          "_VERSION": "517a2e05b7025b57fd503d9a468feaf9a5eaaffa"
         },
         "lifecycle_commands": {
           "create": "/Users/billy/p/multi-cloud/bin/script/build.sh",
@@ -823,7 +644,7 @@
           "CWD": "/Users/billy/p/multi-cloud",
           "DIR": "frontend",
           "REPO_URL": "${google_artifact_registry_repository.repository-app.location}-docker.pkg.dev/ultimate-life-396919/${google_artifact_registry_repository.repository-app.name}/frontend",
-          "_VERSION": "dadccb3e3bb6ce2487b809b039dec3706eef437c"
+          "_VERSION": "517a2e05b7025b57fd503d9a468feaf9a5eaaffa"
         },
         "lifecycle_commands": {
           "create": "/Users/billy/p/multi-cloud/bin/script/build.sh",
